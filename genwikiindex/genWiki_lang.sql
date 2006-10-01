@@ -34,7 +34,7 @@ SELECT     CASE
                       || m.action
                       || '_'
                       || REPLACE (REPLACE (m.NAME, ' ', ''), '_', '')
-                      -- Change it here for your language !!!!
+-- Change it here for your language !!!!
                       || '_es|'
                       || mt.NAME
                       || ']] ('
@@ -76,18 +76,20 @@ SELECT     CASE
            END CASE
       FROM ad_treenodemm t,
            ad_menu m,
-           ad_menu_trl mt,
+           (SELECT *
+              FROM ad_menu_trl
+-- Change it here for your language !!!!
+            WHERE  ad_language = 'es_MX') mt,
            ad_process p,
            ad_form f,
            ad_task k
      WHERE t.ad_tree_id = 10
        AND t.node_id = m.ad_menu_id
-       -- Change it here for your language !!!!
-       AND mt.ad_language(+) = 'es_MX'
-       AND mt.ad_menu_id(+) = m.ad_menu_id
+       AND mt.ad_menu_id = m.ad_menu_id
        AND m.ad_process_id = p.ad_process_id(+)
        AND m.ad_form_id = f.ad_form_id(+)
        AND m.ad_task_id = k.ad_task_id(+)
+       AND m.isactive = 'Y'
 CONNECT BY NOCYCLE PRIOR t.node_id = t.parent_id
 START WITH t.parent_id = 0 OR parent_id IS NULL
   ORDER SIBLINGS BY t.seqno;
