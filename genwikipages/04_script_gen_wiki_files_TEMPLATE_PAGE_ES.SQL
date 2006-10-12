@@ -104,18 +104,7 @@ BEGIN
 
          -- fill the Name Page
          v_file_olh :=
-               TRIM (   'ManPageW_'
-                     || REPLACE (REPLACE (REPLACE (REPLACE (v_wname, ' ', ''),
-                                                   '&',
-                                                   ''
-                                                  ),
-                                          '/',
-                                          ''
-                                         ),
-                                 ',',
-                                 ''
-                                )
-                    )
+               TRIM ('ManPageW_' || TRANSLATE (v_wname, '_&, /', '_'))
             || '_olh'
             || str_end
             || '.wiki';
@@ -201,9 +190,9 @@ BEGIN
          -- For Image
          v_imagename :=
                'ManPageW_'
-            || TRIM (REPLACE (v_wname, ' ', ''))
+            || TRIM (TRANSLATE (v_wname, '_&, /', '_'))
             || '_'
-            || TRIM (REPLACE (v_tname, ' ', ''))
+            || TRIM (TRANSLATE (v_tname, '_&, /', '_'))
             || str_end
             || '.gif';
          UTL_FILE.put_line (f, '[[Image:' || v_imagename || '|center' || ']]');
