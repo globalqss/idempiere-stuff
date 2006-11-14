@@ -195,7 +195,10 @@ BEGIN
             || TRIM (TRANSLATE (v_tname, '_&, /', '_'))
             || str_end
             || '.gif';
-         UTL_FILE.put_line (f, '[[Image:' || v_imagename || '|center' || ']]');
+         UTL_FILE.put_line (f, '[[Image:' || v_imagename 
+	                                  || '|center' 
+			                  || '|800px'
+					  || ']]');
          -- End Image
          -- Open Table for Fields
          UTL_FILE.put_line (f, v_bold || v_str_typef || v_bold);

@@ -162,6 +162,7 @@ BEGIN
        UTL_FILE.put_line (f,'[[Image:'
                               || v_imageName
                               || '|center'
+			      || '|800px'
                               || ']]'
                             );
        -- End Image
