@@ -183,5 +183,9 @@ BEGIN
       UTL_FILE.put_line (f_main, '|}');
    END IF;
 
+   UTL_FILE.put_line (f_main, ' ');
+   UTL_FILE.put_line (f_main, '[[Category:Developer documentation]]');
+   UTL_FILE.put_line (f_main, ' ');
+
    UTL_FILE.fclose (f_main);
 END;
