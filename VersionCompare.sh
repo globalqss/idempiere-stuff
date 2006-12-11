@@ -45,10 +45,10 @@ Compare files with SQL aps bat bsh java jnlp js jsp sh sql xml xsl launch txt ex
 
 echo "step 1/3: Looking for files in ${V1} and not in ${V2}"
 echo "<h2>Files in ${V1} and not in ${V2} </h2>" >> $TMP
-echo "<pre>" >> $TMP
+echo "<xmp>" >> $TMP
 cd $INITDIR/${V1}
 # for i in `find -L . -type f | sort`   # to compare all files
-for i in `find -L . -type f \( -name "*.SQL" -o -name "*.aps" -o -name "*.bat" -o -name "*.bsh" -o -name "*.java" -o -name "*.jnlp" -o -name "*.js" -o -name "*.jsp" -o -name "*.sh" -o -name "*.sql" -o -name "*.xml" -o -name "*.xsl" -o -name "*.gif" -o -name "*.png" -o -name "*.launch" -o -name "*.txt" -o -name "*.dm1" -o -name "*.xcf" \) | sort`
+for i in `find -L . -type f \( -name "*.SQL" -o -name "*.aps" -o -name "*.bat" -o -name "*.bsh" -o -name "*.java" -o -name "*.jnlp" -o -name "*.js" -o -name "*.jsp" -o -name "*.sh" -o -name "*.sql" -o -name "*.xml" -o -name "*.xsl" -o -name "*.gif" -o -name "*.png" -o -name "*.launch" -o -name "*.txt" -o -name "*.dm1" -o -name "*.xcf" \) | fgrep -v .svn | sort`
 do
     cmpf=$INITDIR/${V2}/`dirname $i`/`basename $i`
     if [ ! -s $cmpf ]
@@ -56,14 +56,14 @@ do
         echo $i
     fi
 done >> $TMP
-echo "</pre>" >> $TMP
+echo "</xmp>" >> $TMP
 
 echo "step 2/3: Looking for files in ${V2} and not in ${V1}"
 echo "<h2>Files in ${V2} and not in ${V1} </h2>" >> $TMP
-echo "<pre>" >> $TMP
+echo "<xmp>" >> $TMP
 cd $INITDIR/${V2}
 # for i in `find -L . -type f | sort`   # to compare all files
-for i in `find -L . -type f \( -name "*.SQL" -o -name "*.aps" -o -name "*.bat" -o -name "*.bsh" -o -name "*.java" -o -name "*.jnlp" -o -name "*.js" -o -name "*.jsp" -o -name "*.sh" -o -name "*.sql" -o -name "*.xml" -o -name "*.xsl" -o -name "*.gif" -o -name "*.png" -o -name "*.launch" -o -name "*.txt" -o -name "*.dm1" -o -name "*.xcf" \) | sort`
+for i in `find -L . -type f \( -name "*.SQL" -o -name "*.aps" -o -name "*.bat" -o -name "*.bsh" -o -name "*.java" -o -name "*.jnlp" -o -name "*.js" -o -name "*.jsp" -o -name "*.sh" -o -name "*.sql" -o -name "*.xml" -o -name "*.xsl" -o -name "*.gif" -o -name "*.png" -o -name "*.launch" -o -name "*.txt" -o -name "*.dm1" -o -name "*.xcf" \) | fgrep -v .svn | sort`
 do
     cmpf=$INITDIR/${V1}/`dirname $i`/`basename $i`
     if [ ! -s $cmpf ]
@@ -71,12 +71,12 @@ do
         echo $i
     fi
 done >> $TMP
-echo "</pre>" >> $TMP
+echo "</xmp>" >> $TMP
 
 echo "step 3/3: Looking for differences between files"
 echo "<h2>Differences between files in ${V1} and ${V2} </h2>" >> $TMP
 cd $INITDIR/${V1}
-for i in `find -L . -type f \( -name "*.SQL" -o -name "*.aps" -o -name "*.bat" -o -name "*.bsh" -o -name "*.java" -o -name "*.jnlp" -o -name "*.js" -o -name "*.jsp" -o -name "*.sh" -o -name "*.sql" -o -name "*.xml" -o -name "*.xsl" -o -name "*.launch" -o -name "*.txt" \) | sort`
+for i in `find -L . -type f \( -name "*.SQL" -o -name "*.aps" -o -name "*.bat" -o -name "*.bsh" -o -name "*.java" -o -name "*.jnlp" -o -name "*.js" -o -name "*.jsp" -o -name "*.sh" -o -name "*.sql" -o -name "*.xml" -o -name "*.xsl" -o -name "*.launch" -o -name "*.txt" \) | fgrep -v .svn | sort`
 do
     cmpf=$INITDIR/${V2}/`dirname $i`/`basename $i`
     if [ -s $cmpf ]
@@ -87,14 +87,14 @@ $Header:" $i | dos2unix > /tmp/F${V1}
         fgrep -v "@version
 $Header:" $cmpf | dos2unix > /tmp/F${V2}
 	# Look if there are differences
-        diff -q -b /tmp/F${V2} /tmp/F${V1} >> /dev/null 2>&1
+        diff -q -b /tmp/F${V1} /tmp/F${V2} >> /dev/null 2>&1
         if [ $? -ne 0 ]
         then
 	    echo "$i differs"
             echo "<h3>$i</h3>" >> $TMP
-	    echo "<pre>" >> $TMP
-            diff -b /tmp/F${V2} /tmp/F${V1} >> $TMP
-	    echo "</pre>" >> $TMP
+	    echo "<xmp>" >> $TMP
+            diff -b /tmp/F${V1} /tmp/F${V2} >> $TMP
+	    echo "</xmp>" >> $TMP
         fi
     fi
 done
