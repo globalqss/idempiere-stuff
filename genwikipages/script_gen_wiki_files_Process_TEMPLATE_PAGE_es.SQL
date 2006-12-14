@@ -40,6 +40,10 @@ DECLARE
    v_str_classname_title    VARCHAR (40)       := 'Nombre Clase: ';
    v_str_repvname_title     VARCHAR (40)       := 'Nombre Vista Reporte: ';
    v_str_range_title        VARCHAR (40)       := 'Es Rango: ';
+   v_NO_MODIFY1             VARCHAR(100)      := 'Nota al Editor: NO MODIFIQUE ESTE CODIGO.ESTE ARCHIVO SE GENERA MEDIANTE UN SCRIPT.';
+   v_NO_MODIFY2             VARCHAR(100)      := 'POR FAVOR, AGREGUE SUS CONTRIBUCIONES EN LA SECCION CONTRIBUCIONES';
+
+
 /* END REPLACE THIS VALUE WITH YOU NEED */
    v_str_man_index          VARCHAR (200);
    str_end                  VARCHAR (5);
@@ -127,6 +131,7 @@ BEGIN
       IF v_file_olh <> ' '
       THEN
          -- Close previous file
+	 UTL_FILE.put_line (f, ' ');
          UTL_FILE.fclose (f);
       END IF;
 
@@ -138,6 +143,13 @@ BEGIN
          || '.wiki';
       f := UTL_FILE.fopen ('DIR_TEMP', v_file_olh, 'w');
       UTL_FILE.put_line (f, ' ');
+
+      -- NO Modify Message to Editor 
+      UTL_FILE.put_line (f, '<!-- ' || v_NO_MODIFY1 || ' -->');
+      UTL_FILE.put_line (f, '<!-- ' || v_NO_MODIFY2 || ' -->');
+      UTL_FILE.put_line (f, ' ');
+      -- End No Modify Message
+
       UTL_FILE.put_line (f, '==' || v_str_typep || ': ' || pr.NAME || '==');
       UTL_FILE.put_line (f, ' ');
       UTL_FILE.put_line (f,
@@ -200,7 +212,7 @@ BEGIN
          || '_'
          || TRIM (REPLACE (pr.NAME, ' ', ''))
          || str_end
-         || '.gif';
+         || '.png';
       UTL_FILE.put_line (f, '[[Image:' || v_imagename 
                                        || '|center' 
           			       || '|800px'
@@ -278,5 +290,6 @@ BEGIN
       v_flag_opentable := FALSE;
    END IF;
 
+   UTL_FILE.put_line (f, ' ');
    UTL_FILE.fclose (f);
 END;
