@@ -19,57 +19,48 @@ DECLARE
 /* REPLACE THIS VALUE WITH YOU NEED
  # The Form ID number. If you fill with 0 (zero)
  # the script will generate all files for all forms */
-   v_form_id              NUMBER             := 0;
+   v_form_id               NUMBER             := 0;
 /* REPLACE THIS VALUE WITH YOU NEED
  # (i.e. en_US, de_DE, ru_RU, etc) */
-   v_language               VARCHAR (10)        := 'es_MX';
+   v_language              VARCHAR (10)       := 'es_MX';
 /* REPLACE THIS VALUE WITH YOU NEED
  # Change the following values with the translation for your language!
  # Those are the Titles
 */
-
-   v_str_return             VARCHAR (100)      := 'Retornar al Indice';
-   v_str_typep              VARCHAR (40)       := 'Form';
-   v_str_help_title         VARCHAR (40)       := 'Ayuda ';
-   v_str_desc_title         VARCHAR (40)       := 'Descripción ';
-   v_str_name_title         VARCHAR (40)       := 'Nombre ';
-   v_str_classname_title    VARCHAR (40)       := 'Nombre Clase: ';
-   v_NO_MODIFY1             VARCHAR(100)      := 'Nota al Editor: NO MODIFIQUE ESTE CODIGO.ESTE ARCHIVO SE GENERA MEDIANTE UN SCRIPT.';
-   v_NO_MODIFY2             VARCHAR(100)      := 'POR FAVOR, AGREGUE SUS CONTRIBUCIONES EN LA SECCION CONTRIBUCIONES';
-
+   v_str_return            VARCHAR (100)      := 'Retornar al Indice';
+   v_str_typep             VARCHAR (40)       := 'Form';
+   v_str_help_title        VARCHAR (40)       := 'Ayuda ';
+   v_str_desc_title        VARCHAR (40)       := 'Descripción ';
+   v_str_name_title        VARCHAR (40)       := 'Nombre ';
+   v_str_classname_title   VARCHAR (40)       := 'Nombre Clase: ';
+   v_no_modify1            VARCHAR (100)
+      := 'Nota al Editor: NO MODIFIQUE ESTE CODIGO.ESTE ARCHIVO SE GENERA MEDIANTE UN SCRIPT.';
+   v_no_modify2            VARCHAR (100)
+      := 'POR FAVOR, AGREGUE SUS CONTRIBUCIONES EN LA SECCION CONTRIBUCIONES';
 /* END REPLACE THIS VALUE WITH YOU NEED */
+   v_str_man_index         VARCHAR (200);
+   str_end                 VARCHAR (5);
+   f                       UTL_FILE.file_type;
+   v_file_olh              VARCHAR (80)       := ' ';
+   v_fname                 VARCHAR (80);
+   v_imagename             VARCHAR (100);
+   v_bold                  VARCHAR (3)        := '''''''';   -- For Bold Text
+   v_ital                  VARCHAR (2)        := '''''';   -- For Italic Text
 
-   v_str_man_index          VARCHAR (200);
-   str_end                  VARCHAR (5);
-   f                        UTL_FILE.file_type;
-   v_file_olh               VARCHAR (80)       := ' ';
-   v_fname                  VARCHAR (80);
-   v_imageName              VARCHAR (100);
-   v_bold                   VARCHAR (3)        := '''''''';  -- For Bold Text
-   v_ital                   VARCHAR (2)        := '''''';  -- For Italic Text
-
-   CURSOR Form -- FORM
+   CURSOR form                                                        -- FORM
    IS
-      SELECT    mtrl.AD_LANGUAGE,
-		m.AD_MENU_ID, 
-		m.AD_FORM_ID,
-		mtrl.NAME, 
-		mtrl.DESCRIPTION ,       
-		ftrl.help,
-		f.classname
-	   FROM AD_MENU m, AD_MENU_TRL mtrl, AD_FORM_TRL ftrl, AD_FORM f
-	  WHERE (m.AD_FORM_ID = v_form_id OR v_form_id = 0)
-            AND mtrl.AD_LANGUAGE = v_language
-            AND m.entitytype = 'D'
-	    AND m.action = 'X' 
-	    AND m.isactive='Y'
-            AND m.AD_MENU_ID = mtrl.AD_MENU_ID
-	    AND m.AD_FORM_ID = ftrl.AD_FORM_ID
-            AND m.AD_FORM_ID = f.AD_FORM_ID
-  ORDER BY ad_process_id;
-
-
-
+      SELECT   mtrl.ad_language, m.ad_menu_id, m.ad_form_id, mtrl.NAME,
+               mtrl.description, ftrl.HELP, f.classname
+          FROM ad_menu m, ad_menu_trl mtrl, ad_form_trl ftrl, ad_form f
+         WHERE (m.ad_form_id = v_form_id OR v_form_id = 0)
+           AND mtrl.ad_language = v_language
+           AND m.entitytype = 'D'
+           AND m.action = 'X'
+           AND m.isactive = 'Y'
+           AND m.ad_menu_id = mtrl.ad_menu_id
+           AND m.ad_form_id = ftrl.ad_form_id
+           AND m.ad_form_id = f.ad_form_id
+      ORDER BY ad_process_id;
 BEGIN
    IF LOWER (SUBSTR (v_language, 1, 2)) <> 'en'
    THEN
@@ -82,94 +73,80 @@ BEGIN
                     '[[Manual' || str_end || '|' || TRIM (v_str_return)
                     || ']]';
 
-   FOR Pr IN Form
+   FOR pr IN form
    LOOP
-       SELECT NAME
-         INTO v_fname
-         FROM ad_form
-        WHERE ad_form_id = Pr.ad_form_id;    -- Get Form Name (English)
+      SELECT NAME
+        INTO v_fname
+        FROM ad_form
+       WHERE ad_form_id = pr.ad_form_id;            -- Get Form Name (English)
 
-       IF SQL%ROWCOUNT = 0
-       THEN
-         v_fname := Pr.NAME;
-       END IF;
+      IF SQL%ROWCOUNT = 0
+      THEN
+         v_fname := pr.NAME;
+      END IF;
 
-       IF v_file_olh <> ' '
-       THEN
-        -- Close previous file
-	 UTL_FILE.put_line (f, ' ');
+      IF v_file_olh <> ' '
+      THEN
+         -- Close previous file
+         UTL_FILE.put_line (f, ' ');
          UTL_FILE.fclose (f);
-       END IF;
+      END IF;
 
-       -- fill the Name Page
-       v_file_olh :=
+      -- fill the Name Page
+      v_file_olh :=
             TRIM ('ManPageX_' || TRANSLATE (v_fname, '_&, /', '_'))
-            || '_olh'
-            || str_end
-            || '.wiki';
+         || '_olh'
+         || str_end
+         || '.wiki';
+      f := UTL_FILE.fopen ('DIR_TEMP', v_file_olh, 'w');
+      UTL_FILE.put_line (f, ' ');
+      -- NO Modify Message to Editor
+      UTL_FILE.put_line (f, '<!-- ' || v_no_modify1 || ' -->');
+      UTL_FILE.put_line (f, '<!-- ' || v_no_modify2 || ' -->');
+      UTL_FILE.put_line (f, ' ');
+      -- End No Modify Message
+      UTL_FILE.put_line (f, '==' || v_str_typep || ': ' || pr.NAME || '==');
+      UTL_FILE.put_line (f, ' ');
+      UTL_FILE.put_line (f,
+                            v_bold
+                         || v_str_desc_title
+                         || ': '
+                         || v_bold
+                         || pr.description
+                        );
+      UTL_FILE.put_line (f, ' ');
+      UTL_FILE.put_line (f,
+                            v_bold
+                         || v_str_help_title
+                         || ': '
+                         || v_bold
+                         || ' '
+                         || pr.HELP
+                        );
+      UTL_FILE.put_line (f, ' ');
 
+      -- TECHNICAL DATA
+      IF pr.classname IS NOT NULL
+      THEN
+         UTL_FILE.put_line (f,
+                               '<small>'
+                            || v_str_classname_title
+                            || pr.classname
+                            || ' '
+                            || '</small>'
+                           );
+      END IF;
 
-       f := UTL_FILE.fopen ('DIR_TEMP', v_file_olh, 'w');
-       UTL_FILE.put_line (f, ' ');
+      -- END TECHNICAL DATA
+      UTL_FILE.put_line (f, ' ');
+      -- For Image
+      v_imagename :=
+          'ManPageX_' || TRIM (REPLACE (v_fname, ' ', '')) || str_end
+          || '.png';
+      UTL_FILE.put_line (f, '[[Image:' || v_imagename || ']]');
+   -- End Image
+   END LOOP;                                                 --  FOR Pr IN Pro
 
-       -- NO Modify Message to Editor 
-       UTL_FILE.put_line (f, '<!-- ' || v_NO_MODIFY1 || ' -->');
-       UTL_FILE.put_line (f, '<!-- ' || v_NO_MODIFY2 || ' -->');
-       UTL_FILE.put_line (f, ' ');
-       -- End No Modify Message
-         
-       UTL_FILE.put_line (f, 
-	                     '==' 
-                             || v_str_typep
-                             || ': ' 
-			     || Pr.NAME 
-			     || '==' );
- 
-       UTL_FILE.put_line (f, ' ');
-       UTL_FILE.put_line (f, 
-	                      v_bold
-                              || v_str_desc_title
-                              || ': '
-			      || v_bold
-			      || Pr.DESCRIPTION);
-       UTL_FILE.put_line (f, ' ');
-       UTL_FILE.put_line (f,
-                              v_bold
-			      || v_str_help_title 
-                              || ': '
-			      || v_bold 
-			      ||' ' 
-			      || Pr.HELP);
-
-       UTL_FILE.put_line (f, ' ');
-       
-       -- TECHNICAL DATA
-       IF Pr.classname IS NOT NULL 
-       THEN
-          UTL_FILE.put_line (f,'<small>'
-                               || v_str_classname_title 
-                               || Pr.classname
-                               || ' ' 
-                               || '</small>'
-                               );
-       END IF;
-       -- END TECHNICAL DATA
-       -- For Image
-       v_imageName :=  'ManPageX_' 
-                         || TRIM(REPLACE (v_fname, ' ', ''))
-                         || '_'
-                         || TRIM(REPLACE (Pr.NAME ,' ',''))
-                         || str_end
-                         || '.png';
-         
-       UTL_FILE.put_line (f,'[[Image:'
-                              || v_imageName
-                              || '|center'
-                              || ']]'
-                            );
-       -- End Image
-
-   END LOOP;  --  FOR Pr IN Pro
    UTL_FILE.put_line (f, ' ');
    UTL_FILE.fclose (f);
 END;
