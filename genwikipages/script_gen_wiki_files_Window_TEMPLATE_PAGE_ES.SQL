@@ -215,7 +215,6 @@ BEGIN
             || '.png';
          UTL_FILE.put_line (f, '[[Image:' || v_imagename 
 	                                  || '|center' 
-			                  || '|800px'
 					  || ']]');
          -- End Image
          -- Open Table for Fields
