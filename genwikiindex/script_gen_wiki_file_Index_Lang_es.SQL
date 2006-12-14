@@ -10,12 +10,15 @@ DECLARE
 /* REPLACE THIS VALUE WITH YOU NEED
  # (i.e. en_US, de_DE, ru_RU, etc) */
    v_language         VARCHAR (10)       := 'es_MX';
+   v_currentversion   VARCHAR (5)        := '3.1.2';
 /* REPLACE THIS VALUE WITH YOU NEED
  # Change the following values with the translation for your language!
  # Those are the Titles
 */
    v_str_msg1         VARCHAR (500)
-      := 'Este índice está basado en el menú de ADempiere 3.1.0 menu. Como valor agregado hemos incorporado para cada opción:';
+      :=    'Este índice está basado en el menú de ADempiere '
+         || v_currentversion
+         || '. Como valor agregado hemos incorporado para cada opción:';
    v_str_msg2         VARCHAR (500)
       := '* en la segunda columna el tipo de programa: Workbench, WorkFlow, Process, Report, Task, Window, Form, Menu.';
    v_str_msg3         VARCHAR (500)
@@ -29,6 +32,7 @@ DECLARE
    v_str_modify       VARCHAR (500)
       := 'Por favor, no modifique el contenido, pues este índice se genera automáticamente mediante un script.';
 /* END REPLACE THIS VALUE WITH YOU NEED */
+   v_lang2            VARCHAR (2)        := LOWER (SUBSTR (v_language, 1, 2));
    v_str_man_index    VARCHAR (200);
    str_end            VARCHAR (5);
    f_main             UTL_FILE.file_type;
@@ -43,7 +47,7 @@ DECLARE
    CURSOR c1
    IS
       SELECT     LEVEL, LEVEL - 1 AS levelparent, issummary, mt.NAME,
-                 m.name AS us_name, m.action AS TYPE,
+                 m.NAME AS us_name, m.action AS TYPE,
                  DECODE (m.action,
                          'B', 'Workbench',
                          'F', 'WorkFlow',
@@ -85,14 +89,14 @@ DECLARE
       START WITH t.parent_id = 0 OR parent_id IS NULL
         ORDER SIBLINGS BY t.seqno;
 BEGIN
-   IF LOWER (SUBSTR (v_language, 1, 2)) <> 'en'
+   IF v_lang2 <> 'en'
    THEN
-      str_end := '_' || LOWER (SUBSTR (v_language, 1, 2));
+      str_end := '_' || v_lang2;
    ELSE
       str_end := '';
    END IF;
 
-   v_file := 'Manual' || str_end || '.wiki';
+   v_file := 'Manual_' || v_currentversion || str_end || '.wiki';
    -- Generate Main Page
    f_main := UTL_FILE.fopen ('DIR_TEMP', v_file, 'w');
    v_flag_opentable := FALSE;
@@ -100,6 +104,10 @@ BEGIN
    UTL_FILE.put_line (f_main, v_str_msg2);
    UTL_FILE.put_line (f_main, v_str_msg3);
    UTL_FILE.put_line (f_main, v_str_msg4);
+   UTL_FILE.put_line (f_main, ' ');
+   UTL_FILE.put_line (f_main,
+                      '[[Image:ManPageM_MainMenu_' || v_lang2 || '.png]]'
+                     );
    UTL_FILE.put_line (f_main, ' ');
    UTL_FILE.put_line (f_main,
                       '<center><small>' || v_str_modify || '</small></center>'
@@ -131,7 +139,7 @@ BEGIN
          END IF;
 
          -- Title
-         UTL_FILE.put_line (f_main, v_str_sec || TRIM (r.name) || v_str_sec);
+         UTL_FILE.put_line (f_main, v_str_sec || TRIM (r.NAME) || v_str_sec);
          UTL_FILE.put_line (f_main, ' ');
       ELSE
          -- Table Format
@@ -157,7 +165,7 @@ BEGIN
                             || '<span style="color: white;">'
                             || v_str_dot
                             || '</span>'
-                            || r.name
+                            || r.NAME
                             || ']]'
                            );
          UTL_FILE.put_line
@@ -184,8 +192,9 @@ BEGIN
    END IF;
 
    UTL_FILE.put_line (f_main, ' ');
-   UTL_FILE.put_line (f_main, '[[Category:Developer documentation]]');
+   UTL_FILE.put_line (f_main,
+                      '[[Category:Adempiere' || v_currentversion || ']]'
+                     );
    UTL_FILE.put_line (f_main, ' ');
-
    UTL_FILE.fclose (f_main);
 END;
