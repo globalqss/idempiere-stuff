@@ -16,7 +16,7 @@ DECLARE
 /* REPLACE THIS VALUE WITH YOU NEED
  # The Window ID number. If you fill with 0 (zero)
  # the script will generate all files for all windows */
-   v_window_id                NUMBER             := 123;
+   v_window_id                NUMBER             := 0;
 /* REPLACE THIS VALUE WITH YOU NEED
  # (i.e. en_US, de_DE, ru_RU, etc) */
    v_language                 VARCHAR (10)       := 'en_US_base';
@@ -41,10 +41,10 @@ under the ';                  -- will be concatenated with v_str_text_section
    v_file                     VARCHAR (80)       := ' ';
    v_wname                    VARCHAR (80);
    v_bold                     VARCHAR (3)        := '''''''';
-                                                             -- For Bold Text
+   -- For Bold Text
    v_ital                     VARCHAR (2)        := '''''';
-                                                           -- For Italic Text
 
+   -- For Italic Text
    CURSOR c1
    IS
       SELECT   ad_language, ad_window_id, ad_tab_id, ad_field_id, TYPE, NAME,
@@ -147,6 +147,13 @@ BEGIN
       -- Insert Contributions Section
       UTL_FILE.put_line (f_main, '=' || v_str_contribution_title || '=');
       UTL_FILE.put_line (f_main, ' ');
+      UTL_FILE.put_line (f_main,
+                            '[[Category:Manual|'
+                         || SUBSTR (v_file, 8, 1)
+                         || ' '
+                         || SUBSTR (v_file, 10, 1)
+                         || ']]'
+                        );
       --
       UTL_FILE.fclose (f_main);
    END LOOP;

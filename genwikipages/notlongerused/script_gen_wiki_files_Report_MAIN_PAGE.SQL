@@ -132,6 +132,13 @@ BEGIN
       -- Insert Contributions Section
       UTL_FILE.put_line (f, '=' || v_str_contribution_title || '=');
       UTL_FILE.put_line (f, ' ');
+      UTL_FILE.put_line (f,
+                            '[[Category:Manual|'
+                         || SUBSTR (v_file, 8, 1)
+                         || ' '
+                         || SUBSTR (v_file, 10, 1)
+                         || ']]'
+                        );
       --
       UTL_FILE.fclose (f);
    END LOOP;                                                 --  FOR Pr IN Pro
