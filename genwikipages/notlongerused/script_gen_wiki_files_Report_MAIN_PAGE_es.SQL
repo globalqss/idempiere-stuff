@@ -115,7 +115,9 @@ BEGIN
                         );
       UTL_FILE.put_line (f, ' ');
       -- Insert Template to OnLineHelp
-      UTL_FILE.put_line (f, '<!-- Note to editors: NOT MODIFY THIS CODE -->');
+      UTL_FILE.put_line (f,
+                         '<!-- Nota a editores: NO MODIFICAR ESTE CODIGO -->'
+                        );
       UTL_FILE.put_line (f,
                             '{{:'
                          || TRIM (   'ManPageR_'
@@ -125,13 +127,21 @@ BEGIN
                          || str_end
                          || '}}'
                         );
-      UTL_FILE.put_line (f,
-                         '<!-- END Note to editors: NOT MODIFY THIS CODE -->'
-                        );
+      UTL_FILE.put_line
+                     (f,
+                      '<!-- FIN Nota a editores: NO MODIFICAR ESTE CODIGO -->'
+                     );
       --
       -- Insert Contributions Section
       UTL_FILE.put_line (f, '=' || v_str_contribution_title || '=');
       UTL_FILE.put_line (f, ' ');
+      UTL_FILE.put_line (f,
+                            '[[Category:Manual_es|'
+                         || SUBSTR (v_file, 8, 1)
+                         || ' '
+                         || SUBSTR (v_file, 10, 1)
+                         || ']]'
+                        );
       --
       UTL_FILE.fclose (f);
    END LOOP;                                                 --  FOR Pr IN Pro

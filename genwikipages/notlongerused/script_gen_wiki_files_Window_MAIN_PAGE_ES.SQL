@@ -41,10 +41,10 @@ bajo la ';                    -- will be concatenated with v_str_text_section
    v_file                     VARCHAR (80)       := ' ';
    v_wname                    VARCHAR (80);
    v_bold                     VARCHAR (3)        := '''''''';
-                                                             -- For Bold Text
+   -- For Bold Text
    v_ital                     VARCHAR (2)        := '''''';
-                                                           -- For Italic Text
 
+   -- For Italic Text
    CURSOR c1
    IS
       SELECT   ad_language, ad_window_id, ad_tab_id, ad_field_id, TYPE, NAME,
@@ -113,7 +113,7 @@ BEGIN
       UTL_FILE.put_line (f_main, ' ');
       -- Insert Template to OnLineHelp
       UTL_FILE.put_line (f_main,
-                         '<!-- Note to editors: NOT MODIFY THIS CODE -->'
+                         '<!-- Nota a editores: NO MODIFICAR ESTE CODIGO -->'
                         );
       UTL_FILE.put_line
                       (f_main,
@@ -139,14 +139,22 @@ BEGIN
                        || str_end
                        || '}}'
                       );
-      UTL_FILE.put_line (f_main,
-                         '<!-- END Note to editors: NOT MODIFY THIS CODE -->'
-                        );
+      UTL_FILE.put_line
+                     (f_main,
+                      '<!-- FIN Nota a editores: NO MODIFICAR ESTE CODIGO -->'
+                     );
       --
 
       -- Insert Contributions Section
       UTL_FILE.put_line (f_main, '=' || v_str_contribution_title || '=');
       UTL_FILE.put_line (f_main, ' ');
+      UTL_FILE.put_line (f_main,
+                            '[[Category:Manual_es|'
+                         || SUBSTR (v_file, 8, 1)
+                         || ' '
+                         || SUBSTR (v_file, 10, 1)
+                         || ']]'
+                        );
       --
       UTL_FILE.fclose (f_main);
    END LOOP;
