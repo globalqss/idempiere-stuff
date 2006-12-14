@@ -193,7 +193,7 @@ BEGIN
 
    UTL_FILE.put_line (f_main, ' ');
    UTL_FILE.put_line (f_main,
-                      '[[Category:Adempiere' || v_currentversion || ']]'
+                      '[[Category:Developer documentation]]'
                      );
    UTL_FILE.put_line (f_main, ' ');
    UTL_FILE.fclose (f_main);
