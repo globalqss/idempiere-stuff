@@ -37,6 +37,9 @@ DECLARE
    v_str_name_title        VARCHAR (40)       := 'Nombre ';
    v_str_technical_title   VARCHAR (40)       := 'Datos Técnicos';
    v_str_tablename_title   VARCHAR (40)       := 'Nombre Tabla    : ';
+   v_NO_MODIFY1             VARCHAR(100)      := 'Nota al Editor: NO MODIFIQUE ESTE CODIGO.ESTE ARCHIVO SE GENERA MEDIANTE UN SCRIPT.';
+   v_NO_MODIFY2             VARCHAR(100)      := 'POR FAVOR, AGREGUE SUS CONTRIBUCIONES EN LA SECCION CONTRIBUCIONES';
+
 /* END REPLACE THIS VALUE WITH YOU NEED */
    v_str_man_index         VARCHAR (200);
    str_end                 VARCHAR (5);
@@ -158,7 +161,8 @@ BEGIN
          IF v_file_olh <> ' '
          THEN
             -- Close previous file
-            UTL_FILE.fclose (f);
+            UTL_FILE.put_line (f, ' ');
+          UTL_FILE.fclose (f);
          END IF;
 
          -- fill the Name Page
@@ -169,6 +173,13 @@ BEGIN
             || '.wiki';
          f := UTL_FILE.fopen ('DIR_TEMP', v_file_olh, 'w');
          UTL_FILE.put_line (f, ' ');
+
+	 -- NO Modify Message to Editor 
+         UTL_FILE.put_line (f, '<!-- ' || v_NO_MODIFY1 || ' -->');
+         UTL_FILE.put_line (f, '<!-- ' || v_NO_MODIFY2 || ' -->');
+         UTL_FILE.put_line (f, ' ');
+         -- End No Modify Message
+
          UTL_FILE.put_line (f, '==' || v_str_typew || ': ' || r.NAME || '==');
 
 	 UTL_FILE.put_line (f, ' ');
@@ -293,6 +304,7 @@ BEGIN
    IF v_file_olh <> ' '
    THEN
       -- Close previous file
+      UTL_FILE.put_line (f, ' ');
       UTL_FILE.fclose (f);
    END IF;
    

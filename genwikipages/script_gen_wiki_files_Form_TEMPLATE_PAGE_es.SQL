@@ -34,6 +34,9 @@ DECLARE
    v_str_desc_title         VARCHAR (40)       := 'Descripción ';
    v_str_name_title         VARCHAR (40)       := 'Nombre ';
    v_str_classname_title    VARCHAR (40)       := 'Nombre Clase: ';
+   v_NO_MODIFY1             VARCHAR(100)      := 'Nota al Editor: NO MODIFIQUE ESTE CODIGO.ESTE ARCHIVO SE GENERA MEDIANTE UN SCRIPT.';
+   v_NO_MODIFY2             VARCHAR(100)      := 'POR FAVOR, AGREGUE SUS CONTRIBUCIONES EN LA SECCION CONTRIBUCIONES';
+
 /* END REPLACE THIS VALUE WITH YOU NEED */
 
    v_str_man_index          VARCHAR (200);
@@ -93,8 +96,9 @@ BEGIN
 
        IF v_file_olh <> ' '
        THEN
-          -- Close previous file
-          UTL_FILE.fclose (f);
+        -- Close previous file
+	 UTL_FILE.put_line (f, ' ');
+         UTL_FILE.fclose (f);
        END IF;
 
        -- fill the Name Page
@@ -107,6 +111,12 @@ BEGIN
 
        f := UTL_FILE.fopen ('DIR_TEMP', v_file_olh, 'w');
        UTL_FILE.put_line (f, ' ');
+
+       -- NO Modify Message to Editor 
+       UTL_FILE.put_line (f, '<!-- ' || v_NO_MODIFY1 || ' -->');
+       UTL_FILE.put_line (f, '<!-- ' || v_NO_MODIFY2 || ' -->');
+       UTL_FILE.put_line (f, ' ');
+       -- End No Modify Message
          
        UTL_FILE.put_line (f, 
 	                     '==' 
@@ -150,7 +160,7 @@ BEGIN
                          || '_'
                          || TRIM(REPLACE (Pr.NAME ,' ',''))
                          || str_end
-                         || '.gif';
+                         || '.png';
          
        UTL_FILE.put_line (f,'[[Image:'
                               || v_imageName
@@ -161,6 +171,6 @@ BEGIN
        -- End Image
 
    END LOOP;  --  FOR Pr IN Pro
-   
+   UTL_FILE.put_line (f, ' ');
    UTL_FILE.fclose (f);
 END;
