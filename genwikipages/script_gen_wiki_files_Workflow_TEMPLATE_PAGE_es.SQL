@@ -74,7 +74,7 @@ DECLARE
                 ' ' as action
  	   FROM AD_MENU m, AD_WORKFLOW f, AD_MENU_TRL mtrl
 	  WHERE (m.AD_WORKFLOW_ID = v_workflow_id OR v_workflow_id = 0)
-            AND mtrl.AD_language = 'es_ES'
+            AND mtrl.AD_language = v_language
             AND m.entitytype = 'D'
 	    AND m.action = 'F' 
 	    AND m.isactive='Y'
@@ -115,7 +115,7 @@ DECLARE
                             AND ad_menu.AD_MENU_ID <> 0)
             AND (n.AD_workflow_ID = v_workflow_id OR v_workflow_id = 0) 
             AND n.AD_wf_NODE_ID = ntrl.AD_wf_NODE_ID
-            AND ntrl.AD_Language = 'es_ES'
+            AND ntrl.AD_Language = v_language
             AND n.isactive='Y'
             AND n.AD_wf_NODE_ID = x.AD_wf_NODE_ID(+)
             AND n.ad_process_id = p.ad_process_id(+)
