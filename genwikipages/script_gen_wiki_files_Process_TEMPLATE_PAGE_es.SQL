@@ -215,8 +215,7 @@ BEGIN
          || '.png';
       UTL_FILE.put_line (f, '[[Image:' || v_imagename 
                                        || '|center' 
-          			       || '|800px'
-				       || ']]');
+    				       || ']]');
       -- End Image
       -- PARAMETERS
       v_ad_process_id := pr.ad_process_id;

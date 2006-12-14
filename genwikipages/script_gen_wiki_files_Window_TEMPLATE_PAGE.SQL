@@ -212,7 +212,7 @@ BEGIN
             || TRIM (TRANSLATE (v_tname, '_&, /', '_'))
             || str_end
             || '.png';
-         UTL_FILE.put_line (f, '[[Image:' || v_imagename || '|center' || '|800px' || ']]');
+         UTL_FILE.put_line (f, '[[Image:' || v_imagename || '|center' || ']]');
          -- End Image
          -- Open Table for Fields
          UTL_FILE.put_line (f, v_bold || v_str_typef || v_bold);
