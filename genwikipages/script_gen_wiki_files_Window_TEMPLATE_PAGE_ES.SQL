@@ -210,7 +210,8 @@ BEGIN
             || TRIM (TRANSLATE (v_tname, '_&, /', '_'))
             || str_end
             || '.png';
-         UTL_FILE.put_line (f, '[[Image:' || v_imagename || ']]');
+         UTL_FILE.put_line (f, '[[Image:' || v_imagename || '|center' || ']]');
+         UTL_FILE.put_line (f, ' ');
          -- End Image
          -- Open Table for Fields
          UTL_FILE.put_line (f, v_bold || v_str_typef || v_bold);

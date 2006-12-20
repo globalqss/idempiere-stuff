@@ -143,7 +143,8 @@ BEGIN
       v_imagename :=
           'ManPageX_' || TRIM (REPLACE (v_fname, ' ', '')) || str_end
           || '.png';
-      UTL_FILE.put_line (f, '[[Image:' || v_imagename || ']]');
+      UTL_FILE.put_line (f, '[[Image:' || v_imagename || '|center' || ']]');
+      UTL_FILE.put_line (f, ' ');
    -- End Image
    END LOOP;                                                 --  FOR Pr IN Pro
 
