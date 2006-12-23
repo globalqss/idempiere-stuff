@@ -4,19 +4,20 @@ CREATE OR REPLACE FORCE VIEW rv_query_for_manual
    Contributor: Carlos Antonio Ruiz Gomez - globalqss
 */
 AS
-   SELECT ad_language, ad_window_id, 0 ad_tab_id, 0 ad_field_id, 'W' TYPE,
-          NAME, description, HELP, 0 seqtab, 0 seqfld, '' dbtable,
-          '' dbcolumn, '' dbtype, '' adempieretype
-     FROM ad_window_vt
+   SELECT vt.ad_language, vt.ad_window_id, 0 ad_tab_id, 0 ad_field_id, 'W' TYPE,
+          vt.NAME, vt.description, vt.HELP, 0 seqtab, 0 seqfld, '' dbtable,
+          '' dbcolumn, '' dbtype, '' adempieretype, w.ISBETAFUNCTIONALITY
+     FROM ad_window_vt vt
+     INNER JOIN AD_Window w ON (vt.AD_Window_ID=w.AD_Window_ID)
     WHERE EXISTS (
              SELECT 1
                FROM ad_window
-              WHERE ad_window.ad_window_id = ad_window_vt.ad_window_id
+              WHERE ad_window.ad_window_id = vt.ad_window_id
                 AND ad_window.isactive = 'Y'
                 AND ad_window.entitytype = 'D')
    UNION
    SELECT t.ad_language, t.ad_window_id, t.ad_tab_id, 0, 'T', t.NAME,
-          t.description, t.HELP, t.seqno, 0, tt.tablename, '', '', ''
+          t.description, t.HELP, t.seqno, 0, tt.tablename, '', '', '', ''
      FROM ad_tab_vt t, ad_table tt, user_tables ut
     WHERE EXISTS (
              SELECT 1
@@ -45,7 +46,8 @@ AS
                                        || ')'
                                       )
                     ),
-          dba_displaytype (cc.ad_reference_id)
+          dba_displaytype (cc.ad_reference_id),
+	  ''
      FROM ad_field_vt f,
           ad_tab t,
           ad_table tt,
@@ -70,12 +72,12 @@ AS
 -- Base Language en_US
    SELECT 'en_US_base', ad_window_id, 0 ad_tab_id, 0 ad_field_id, 'W' TYPE,
           NAME, description, HELP, 0 seqtab, 0 seqfld, '' dbtable,
-          '' dbcolumn, '' dbtype, '' compieretype
+          '' dbcolumn, '' dbtype, '' compieretype, ISBETAFUNCTIONALITY
      FROM ad_window
     WHERE isactive = 'Y' AND entitytype = 'D'
    UNION
    SELECT 'en_US_base', t.ad_window_id, t.ad_tab_id, 0, 'T', t.NAME,
-          t.description, t.HELP, t.seqno, 0, tt.tablename, '', '', ''
+          t.description, t.HELP, t.seqno, 0, tt.tablename, '', '', '',''
      FROM ad_tab t, ad_table tt, user_tables ut
     WHERE t.isactive = 'Y'
       AND t.ad_table_id = tt.ad_table_id
@@ -100,7 +102,7 @@ AS
                                        || ')'
                                       )
                     ),
-          dba_displaytype (cc.ad_reference_id)
+          dba_displaytype (cc.ad_reference_id),''
      FROM ad_field f,
           ad_tab t,
           ad_table tt,
