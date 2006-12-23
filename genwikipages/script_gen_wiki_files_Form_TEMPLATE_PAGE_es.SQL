@@ -37,6 +37,7 @@ DECLARE
       := 'Nota al Editor: NO MODIFIQUE ESTE CODIGO.ESTE ARCHIVO SE GENERA MEDIANTE UN SCRIPT.';
    v_no_modify2            VARCHAR (100)
       := 'POR FAVOR, AGREGUE SUS CONTRIBUCIONES EN LA SECCION CONTRIBUCIONES';
+   v_BetaFunctionality     VARCHAR (40)        := '= FUNCIONALIDAD BETA =';     
 /* END REPLACE THIS VALUE WITH YOU NEED */
    v_str_man_index         VARCHAR (200);
    str_end                 VARCHAR (5);
@@ -50,7 +51,7 @@ DECLARE
    CURSOR form                                                        -- FORM
    IS
       SELECT   mtrl.ad_language, m.ad_menu_id, m.ad_form_id, mtrl.NAME,
-               mtrl.description, ftrl.HELP, f.classname
+               mtrl.description, ftrl.HELP, f.classname, f.ISBETAFUNCTIONALITY
           FROM ad_menu m, ad_menu_trl mtrl, ad_form_trl ftrl, ad_form f
          WHERE (m.ad_form_id = v_form_id OR v_form_id = 0)
            AND mtrl.ad_language = v_language
@@ -107,6 +108,19 @@ BEGIN
       -- End No Modify Message
       UTL_FILE.put_line (f, '==' || v_str_typep || ': ' || pr.NAME || '==');
       UTL_FILE.put_line (f, ' ');
+
+      IF pr.ISBETAFUNCTIONALITY = 'Y'
+      THEN
+	-- Msg. Beta Functionality (Red & Bold - centered)
+	UTL_FILE.put_line (f, '<center><font color="#FF0000">' 
+	        	      || v_bold
+			      || v_BetaFunctionality
+			      || v_bold
+			      || '</font></center>'
+			   );
+	 UTL_FILE.put_line (f, ' ');
+       END IF; -- IF r.ISBETAFUNCTIONALITY = 'Y'
+
       UTL_FILE.put_line (f,
                             v_bold
                          || v_str_desc_title

@@ -44,6 +44,7 @@ DECLARE
       := 'Nota al Editor: NO MODIFIQUE ESTE CODIGO.ESTE ARCHIVO SE GENERA MEDIANTE UN SCRIPT.';
    v_no_modify2             VARCHAR (100)
       := 'POR FAVOR, AGREGUE SUS CONTRIBUCIONES EN LA SECCION CONTRIBUCIONES';
+   v_BetaFunctionality     VARCHAR (40)        := '= FUNCIONALIDAD BETA =';
 /* END REPLACE THIS VALUE WITH YOU NEED */
    v_str_man_index          VARCHAR (200);
    str_end                  VARCHAR (5);
@@ -61,7 +62,7 @@ DECLARE
       SELECT   mtrl.ad_language, 'P' AS TYPE, m.ad_menu_id, m.ad_process_id,
                mtrl.NAME, mtrl.description, ptrl.HELP,
                rv.NAME AS repviewname, p.procedurename, p.classname,
-               p.VALUE AS tech4
+               p.VALUE AS tech4, p.ISBETAFUNCTIONALITY
           FROM ad_menu m,
                ad_process p,
                ad_reportview rv,
@@ -150,6 +151,19 @@ BEGIN
       -- End No Modify Message
       UTL_FILE.put_line (f, '==' || v_str_typep || ': ' || pr.NAME || '==');
       UTL_FILE.put_line (f, ' ');
+
+      IF pr.ISBETAFUNCTIONALITY = 'Y'
+      THEN
+	-- Msg. Beta Functionality (Red & Bold - centered)
+	UTL_FILE.put_line (f, '<center><font color="#FF0000">' 
+	       	              || v_bold
+			      || v_BetaFunctionality
+			      || v_bold
+			      || '</font></center>'
+			    );
+	   UTL_FILE.put_line (f, ' ');
+      END IF; -- IF pr.ISBETAFUNCTIONALITY = 'Y'
+
       UTL_FILE.put_line (f,
                             v_bold
                          || v_str_desc_title
