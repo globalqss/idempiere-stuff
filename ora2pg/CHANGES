@@ -1,0 +1,260 @@
+2001 05 09 - Initial version 1.0
+
+2001 05 09 - Version 1.1
+	- Add table grant extraction based on group.
+	  Oracle ROLES are exported as groups in PG
+
+2001 05 11 - Version 1.2
+	- Views extraction is now really done with the option type=>'VIEW'
+	- Add indexes extraction on tables.
+	- Changes name of constraints, default is now used.
+	- Add debug printing to see that the process is running :-)
+	- Add extraction of only required tablename.
+	- Add extraction of only n to n table indice. Indices of extraction
+	  can be obtained with the option showtableid set to 1.
+	- Fix print of NOT NULL field.
+	- Complete rewrite of the grant extraction
+	- Complete rewrite of most things
+
+2001 06 20 - Version 1.3
+	- Grant/privilege extraction are now done separatly with option
+	  type=>'GRANT'
+	- Sequence extraction with the option type=>'SEQUENCE'
+	- Trigger extraction with the option type=>'TRIGGER'
+	- Function extraction with the option type=>'FUNCTION' and
+	  type=>'PROCEDURE'
+	- Complete rewrite of the foreign key extraction
+	- Fix incorrect type translation and many other bug fix
+	- Add schema only extraction by option schema => 'MYSCHEM'
+
+2001 06 27 - Version 1.4
+	- Add online Oracle data extraction and insertion into PG database.
+	- Data export as insert statement (type => DATA)
+	- Data export as copy from stdin statement (type => COPY)
+
+2001 12 28 - Version 1.5
+	- Fix LongReadLen problem when exporting Oracle data on LONG and LOB
+	  types. Thanks to Stephane Schildknecht for report and test.
+	- Add more precision on NUMBER type conversion
+	- Add conversion of type LONG, LOB, FILE
+	- Fix a problem when extracting data, sometime table could need to be
+	  prefixed by the schema name.
+	- Fix output of Oracle data extraction. It now require a call to
+	  function export_data().
+
+2002 01 07 - Version 1.6
+	- Fix problem exporting NULL value. Thanks to Stephane Schildknecht.
+
+2002 02 14 - Version 1.7
+	- Remove export of OUTLINE object type. Thanks to Jean-Paul ARGUDO.
+
+2002 03 05 - Version 1.8
+	- Add Oracle type FLOAT conversion to float8.
+	- Add column alias extraction on view. Thanks to Jean-Francois RIPOUTEAU
+	- Add PACKAGE extraction (type => DATA).
+
+2002 06 04 - Version 1.9
+	- Fix a problem export data which fill NULL instead of 0 or empty string.
+	  Thanks to Jan Kester.
+	- Add time with date when export data [ tochar('YYYY-MM-DD HH24:MI:SS') ].
+	  Thanks to Paolo Mattioli.
+
+2002 07 29 - Version 1.10
+	- Fix a problem with local settings regarding decimal separator (all ,
+	  are changed to .) Thank to Jan Kester.
+
+2002 09 27 - Version 1.11
+	- Fix a problem when retrieving package+package body. Thanks to Mike
+	  WILHELM-HILTZ.
+	- Set LongReadLen to 100000 when exporting table information. Many users
+	  reports this kind of error: A-01406 LongReadLen too small and/or LongTruncOk
+	  not set. This should fix the problem else you must increase the value.
+	- Filtering by owner for better performance when retreiving database schema.
+	  Thanks to Jefferson MEDEIROS.
+
+2002 12 03 - Version 1.12
+
+	I have fixed 2 bugs when using it against Oracle 817R3 on linux.
+
+	- Fix problem regarding RI constraints, the owner name was not
+	  getting into the sql statement. Thank to Ian Boston.
+
+	- Moved all the RI constraints out of the create table statement.
+	  Thank to Ian Boston for this contribution. This was a major request
+	  from Ora2pg users.
+
+2002 12 26 - Version 2.0
+
+	- Clean code.
+	- Fix COPY output on column value with end of line and add column naming.
+	- Add support to the PostgreSQL 7.3 schema. So Oracle schema can now be
+	  exported. (see export_schema init option)
+	- Remove data extraction limit (old default: 10) so each tuple will be
+	  dump by default.
+
+2004 03 09 - Version 2.1
+
+	- Fix COPY output by replacing special character.
+	- Add configuration file usefull for people who don't have Perl in mind
+          Thank's to Tanya Krasnokutsky to force me to do that :-)
+	- Fix other minor problem.
+
+2004 04 13 - Version 2.2
+
+	- Add EXCLUDE configuration option to allow table exclusion
+	  from all extraction.
+	- Fix a bug in escaping single quote on data export.
+
+2004 04 13 - Version 2.3
+
+	- Fix bug in date/time conversion when using data export limit. Thanks
+	  to Andreas Haumer.
+	- Add sort order when extracting tables and data to respect the TABLES
+	  limited extraction array write order. Usefull if you have foreign key
+	  constraints. Thanks to Andreas Haumer for the idea.
+
+2004 08 22 - version 2.4
+
+	- Fix bug in DBI errstr call.
+	- Add CASE_SENSITIVE configuration option to allow case sensitivity on
+	  object name. Thanks to Thomas Wegner.
+	- Fix major bug in unique keys extraction. Thanks to Andreas Haumer and
+	  Marco Lombardo for their great help.
+	- Add CHECK constraint extration. Thanks again to Andreas Haumer.
+	- Add IMPORT configuration option to include common configuration file
+	  throught multiple configuration files. Thanks to Adam Sah and Zedo Inc.
+	- Add SKIP configuration option to turning off extraction of certain schema
+	  features. Thanks to Adam Sah and Zedo Inc.
+	- Fix bug in excluded tables
+	- Fix backslash escaping. Thanks to Adam Sah and Zedo Inc.
+	- Add REPLACE_TABLES configuration option to change table name during data
+	  extraction.
+	- Add REPLACE_COLS configuration option to change columns name during data
+	  extraction.
+	- Add WHERE configuration option to add where clause to each table or specific
+	  tables during extraction. Usefull for replication. Thanks to Adam Sah and
+	  Zedo Inc.
+	- Add progress indicators (per 1000 rows) and performance results during data
+	  extraction in debug mod. Thanks to Adam Sah and Zedo Inc.
+	- Add Gzip and Bzip2 compress to output file if extension .gz or .bz2. Gzip
+	  compress require perl module Compress::Zlib from CPAN. Thanks to Adam Sah
+	  for the idea.
+
+2004 10 13 - version 2.5
+
+	- Fix extraction problem when the connection to Oracle DB is not as DBA. Add a
+	  new configuration directive 'USER_GRANTS' to do that. Thanks to Octavi Fors
+	  for the report.
+
+2004 12 23 - version 2.6
+
+	- Fix duplicate output during export. Thanks to Adriano Bonat for the report.
+	- Fix data limit infinite loop during data extraction. Thanks to Thomas REISS
+	  for the report.
+	- Add 'GEN_USER_PWD' configuration option allowing to generate a random password.
+	  Thanks to Antonios Christofide for help. (Require String::Random from CPAN).
+	- Fix USER/ROLES/GRANT extraction problem. Now all users are dumped. All roles
+	  are translated to PostgreSQL groups. All grants are exported. YOU MUST EDIT the
+	  output file to rewrite real privilege and match your needs. Thanks to Antonios
+	  Christofide for help.
+	- Fix split COPY export into multiple transaction for large data export. The number
+	  of row per transaction is set to 'DATA_LIMIT' value. A value of O mean all in a
+	  single transaction.
+
+2004 12 23 - version 2.7
+
+	- Add 'FKEY_DEFERRABLE' configuration option to force foreign key constraints to
+	  be exported as deferrable. Thanks to Antonios Christofide for help.
+	- Add 'DEFER_FKEY' configuration option to defer all foreign key constraints during
+	  data export. Thanks to Antonios Christofide for help.
+
+2004 12 24 - version 2.8
+
+	- Fix/add support to data export of type BLOB, RAW and LONG RAW. Thanks to Antonios
+	  Christofide for help.
+
+2004 12 24 - version 2.9
+
+	- Debuging output rewrite. Thanks to Antonios Christofide for help.
+	- Add 'PG_NUMERIC_TYPE' configuration option to replace portable numeric type into
+	  PostgreSQL internal type (smallint, integer, bigint, real and float).
+
+
+2004 12 24 - version 3.0
+
+	- Add 'TABLESPACE' extraction type to create PostgreSQL v8.0 tablespace.
+
+2005 02 10 - version 3.1
+
+	- Fix bug on deferrable constraint. Thanks to Antonios Christofide for the
+	  patch.
+	- Fix problem on defer_fkey that should be in a transaction. Thanks to 
+	  Antonios Christofide for the patch.
+	- Add sort by column position during schema extraction.
+	- Add support to SYSDATE. Thanks to David Cotter - Alatto Technologies Ltd
+
+2005 02 11 - version 3.2
+
+	- Fix patch error on column position sort
+	- Replace 'now' by CURRENT_TIMESTAMP on SYSDATE replacement
+	- Fix bytea type that was not quoted.
+
+2005 02 22 - version 3.3
+
+	- Fix bug "Modification of a read-only value attempted"
+
+2006 02 10 - version 3.4
+
+	This release add better support to Oracle grant, function and grant
+	extraction. Great thanks to the Pg team!
+
+	- Add preservation of oracle primary key names. See KEEP_PKEY_NAMES
+	  configuration option. Thanks to Antonios Christofides for this patch.
+	- Fix bug in case insensitive check constrainte. Thanks to Wojciech
+	  Szenajch for the patch.
+	- Fix saving data to files correctly (binmod) when the oracle database
+	  contains utf8 chars. Thanks to Richard Chen for the report.
+	- Fix bug on view extraction when a column contains the word WITH.
+	  Thanks to Richard Chen for the patch.
+	- Fix wrong mapping between tge data type in Oracle "number(10)" and
+	  Postgresql, which should be "integer" and not "bigint". Thanks to
+	  Sergio Freire for the patch.
+	- Fix bug in EXCLUDE configuration directive parsing. Thanks to Matt
+	  Miller for the patch.
+
+2006 03 22 - version 4.0
+
+	- Add validation of the requested schema in the database before all.
+	  Thanks to Max Walton for the idea.
+	- Add multiple export type at the same time. Thanks to Max Walton
+	  for the idea.
+	- Add support for in/out/inout function parameter. See PG_SUPPORTS_INOUT
+	  configuration option. Thanks to Bernd Helmle for this great
+	  contribution/patch.
+	- Add support for ROLES with Pg v8.1+. See PG_SUPPORTS_ROLE configure
+	  option.
+
+2006 03 28 - version 4.1
+
+	- Fix a problem when using data_limit and where clause. Thank to
+	  Rene Bentzen for the patch.
+	- Add enable/disable trigger on data import. Thank to Bernd Helmle.
+	- Fix escaping of chr(13) MS crashing data import into PG. Thank
+	  to Ugo Brunel (BULL).
+
+2006 06 08 - version 4.2
+
+	- Fix a miss taping on constraint type search that convert unique key
+	to primary key. Thank to Ugo BRUNEL (BULL) for the patch.
+	- Fix case sensitivity on CHECK constraint that could cause problem
+	when check value is uppercase. Thank to Ugo BRUNEL (BULL) for the patch.
+
+------------------------------------------------------------------------------
+
+Special thanks to Josian Larcheveque and Stephane Silly as Oracle DBA and their "patience".
+Many thanks for all congratulation message, idea and bug report+fix I received.
+
+Very special thanks to Jean-Paul Argudo that represent Ora2Pg at Linux Solution Paris 2005.
+
+Gilles DAROLD <gilles@darold.net>
+

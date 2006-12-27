@@ -1,0 +1,16 @@
+####################  Ora2Pg Configuration file   #####################
+
+# Set the Oracle home directory
+# ORACLE_HOME	/usr/local/oracle/oracle816
+# ORACLE_HOME	/cygdrive/e/oracle/product/10.1.0/Db_1  # tested ok with cygwin
+ORACLE_HOME	/usr/lib/oracle/xe/app/oracle/product/10.2.0/server  # on linux fc4
+
+# Set Oracle database connection (datasource, user, password)
+# ORACLE_DSN	dbi:Oracle:host=thedb.mydom.fr;sid=TEST
+ORACLE_DSN	dbi:Oracle:host=linuxqss;sid=xe
+ORACLE_USER	REFERENCE
+ORACLE_PWD	reference
+
+# Oracle schema to use
+#SCHEMA		APPS
+SCHEMA		REFERENCE
