@@ -41,17 +41,29 @@ DECLARE
    -- v_novalidate  VARCHAR2(10)    := 'novalidate'; -- faster but unsure
    v_sql1         VARCHAR2 (1024);
 
-   CURSOR cur_contraints
+   CURSOR cur_contraints_ena
    IS
       SELECT table_name, constraint_name
         FROM user_constraints
        WHERE constraint_type = 'R' AND status = 'ENABLED';
 
-   CURSOR cur_triggers
+   CURSOR cur_contraints_dis
+   IS
+      SELECT table_name, constraint_name
+        FROM user_constraints
+       WHERE constraint_type = 'R' AND status = 'DISABLED';
+
+   CURSOR cur_triggers_ena
    IS
       SELECT trigger_name
         FROM user_triggers
        WHERE status = 'ENABLED';
+
+   CURSOR cur_triggers_dis
+   IS
+      SELECT trigger_name
+        FROM user_triggers
+       WHERE status = 'DISABLED';
 
    CURSOR cur_removedata
    IS
@@ -59,11 +71,11 @@ DECLARE
              || tablename
              || ' where AD_Client_ID='
              || v_client_id AS v_sql
-        FROM ad_table a
+        FROM AD_TABLE a
        WHERE a.isview = 'N'
          AND EXISTS (
                 SELECT ad_column_id
-                  FROM ad_column c
+                  FROM AD_COLUMN c
                  WHERE a.ad_table_id = c.ad_table_id
                    AND UPPER (c.columnname) = 'AD_CLIENT_ID')
       UNION
@@ -73,18 +85,18 @@ DECLARE
              || columnname
              || '='
              || v_client_id AS v_sql
-        FROM ad_column c, ad_table t
+        FROM AD_COLUMN c, AD_TABLE t
        WHERE ad_reference_value_id = 129
          AND UPPER (columnname) <> 'AD_CLIENT_ID'
          AND t.ad_table_id = c.ad_table_id;
 BEGIN
-   DBMS_OUTPUT.put_line ('  Delete Client Where AD_Client_ID=' || v_client_id);
+   DBMS_OUTPUT.PUT_LINE ('  Delete Client Where AD_Client_ID=' || v_client_id);
    /****************************************************************
     *  Disable all the constraints one by one
     ****************************************************************/
-   DBMS_OUTPUT.put_line (' Disable the contraints ');
+   DBMS_OUTPUT.PUT_LINE (' Disable the contraints ');
 
-   FOR p IN cur_contraints
+   FOR p IN cur_contraints_ena
    LOOP
       v_sql1 :=
             'alter table '
@@ -96,9 +108,9 @@ BEGIN
       EXECUTE IMMEDIATE v_sql1;
    END LOOP;                                             -- Disable contraints
 
-   DBMS_OUTPUT.put_line (' Disable the triggers ');
+   DBMS_OUTPUT.PUT_LINE (' Disable the triggers ');
 
-   FOR p IN cur_triggers
+   FOR p IN cur_triggers_ena
    LOOP
       v_sql1 := 'alter trigger ' || p.trigger_name || ' disable ';
 
@@ -120,9 +132,9 @@ BEGIN
    /****************************************************************
    *  Disable all the constraints one by one
    ****************************************************************/
-   DBMS_OUTPUT.put_line (' Enable the contraints ');
+   DBMS_OUTPUT.PUT_LINE (' Enable the contraints ');
 
-   FOR p IN cur_contraints
+   FOR p IN cur_contraints_dis
    LOOP
       v_sql1 :=
             'alter table '
@@ -136,9 +148,9 @@ BEGIN
       EXECUTE IMMEDIATE v_sql1;
    END LOOP;                                              -- Enable contraints
 
-   DBMS_OUTPUT.put_line (' Enable the triggers ');
+   DBMS_OUTPUT.PUT_LINE (' Enable the triggers ');
 
-   FOR p IN cur_triggers
+   FOR p IN cur_triggers_dis
    LOOP
       v_sql1 := 'alter trigger ' || p.trigger_name || ' enabled ';
 
