@@ -11,12 +11,11 @@
  ***
  * Title:   Remove a Client in Adempiere. 
  * Description:
- *	- Disable all the constraints and triggers
+ *  - Disable all the constraints and triggers
  *  - Delete the records from all the table
- *  - Enable all  the constraints and triggers
+ *  - Enable  all the constraints and triggers
  *
  * Warning:
- *  - This script is only for Oracle 9.
  *  - Please backup all the data before you use this script
  *
  * Guide:
