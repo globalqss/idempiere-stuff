@@ -145,7 +145,7 @@ BEGIN
       -- For Image
       v_imagename :=
             'ManPageP_'
-         || TRIM (REPLACE (v_tname, ' ', ''))
+         || TRIM(TRANSLATE (v_tname, '_&, /', '_'))
          || str_end
          || '.png';
       UTL_FILE.put_line (f, '[[Image:' || v_imagename || '|center' || ']]');
