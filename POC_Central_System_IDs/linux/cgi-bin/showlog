@@ -1,0 +1,12 @@
+#!/bin/sh
+CAT=/bin/cat
+
+echo Content-type: text/plain
+echo ""
+
+if [[ -x $CAT ]]
+then
+        $CAT ../data/$1_Log.txt
+else
+        echo Cannot find command on this system.
+fi

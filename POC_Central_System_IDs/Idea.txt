@@ -1,0 +1,30 @@
+Management for dictionary tables 
+
+currently 18 in http://adempiere.com/wiki/index.php/DevGuide_ID-Number_ranges
+but the model can be extended easily for any table
+
+
+1 - File with the ID's to be consumed (not a sequence, to allow reuse when somebody reserved by mistake)
+i.e.
+AD_Column_Seqs.txt
+53043
+53044
+53045
+...
+
+2 - File with log of usage (ID, developer, alt-key, comment)
+AD_Column_Log.txt
+53251|hengsin|AD_UserQuery,AD_Tab_ID|[ 1798539 ] Cannot Save a User Query
+
+3 - CGI
+Authenticated CGI Script that receives following info:
+auth - user, password
+receive - table, alt-key, comment
+return - ID
+
+probar que se ejecute con un formulario http
+
+cambiar MSequence para obtener los ID's del sistema de esta forma cuando se ejecuta con mantenimiento del diccionario
+Supongo que se requiere guardar en variables de contexto/preferencias - usuario, password, comentario
+Y definir las tablas manejadas de esta forma
+
