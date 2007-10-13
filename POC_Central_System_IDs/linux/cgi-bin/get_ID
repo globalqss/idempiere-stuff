@@ -1,0 +1,65 @@
+#!/bin/sh
+
+. ./bashlib
+
+# Must be called with variables
+# USER
+# PASSWORD
+# TABLE
+# ALTKEY
+# COMMENT
+
+echo Content-type: text/html
+echo ""
+
+if [ "x$FORM_USER" = "x" -o "x$FORM_PASSWORD" = "x" -o "x$FORM_TABLE" = "x" ]
+then
+    echo "ERROR: Required parameters user, password, table"
+    exit 1
+fi
+
+# TODO: Verify identity (auth)
+FILEPWD=../data/RegisteredDevelopers
+FOUNDLINE=`fgrep "$FORM_USER|$FORM_PASSWORD" $FILEPWD | wc -l`
+if [ $FOUNDLINE -ne 1 ]
+then
+    echo "ERROR: Not registered developer"
+    exit 1
+fi
+
+# TODO: Verify collision of alt-key
+
+# TODO: For future enhancement - implement a reservation table instead of a counter (it will allow reuse of wrongly reserved ID's)
+
+# Get Current ID from Table
+FILE=../data/${FORM_TABLE}_Seq.txt
+FILELOCK=../data/${FORM_TABLE}_Seq.lock
+FILELOG=../data/${FORM_TABLE}_Log.txt
+
+while [ -r $FILELOCK ]
+do
+   sleep 1
+done
+> $FILELOCK
+
+if [ -s $FILE ]
+then
+    ID=`cat ../data/${FORM_TABLE}_Seq.txt`
+else
+    ID=50000
+fi
+if [ "x$ID" = x ]
+then
+    ID=50000
+fi
+if [ "$ID" -lt 50000 ]
+then
+    ID=50000
+fi
+NEXTID=`expr $ID + 1`
+echo $NEXTID > $FILE
+echo "$ID|$FORM_USER|$FORM_ALTKEY|$FORM_COMMENT" >> $FILELOG
+rm $FILELOCK
+
+echo "$ID"
+exit 0
