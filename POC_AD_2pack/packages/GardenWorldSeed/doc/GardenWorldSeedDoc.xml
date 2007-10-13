@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/css" href="adempiereDocument.css"?>
+
+<adempiereDocument>
+<header>GardenWorldSeed Package Description</header>
+<H1>Package Name:</H1>
+<packagename>GardenWorldSeed</packagename>
+<H1>Creator:</H1>
+<creator>team@adempiere.org</creator>
+<H1>Email Address:</H1>
+<creatorcontact>team@adempiere.org</creatorcontact>
+<H1>Created:</H1>
+<createddate>2007-10-13 00:21:50.0</createddate>
+<H1>Updated:</H1>
+<updateddate>2007-10-13 00:21:50.0</updateddate>
+<H1>Description:</H1>
+<description>Garden World Seed for Migration</description>
+<H1>Instructions:</H1>
+<instructions>Run PackIn against this package to migrate the GardenWorld Seed</instructions>
+<H1>Files in Package:</H1>
+<file>File: PackOut.xml</file>
+<filedirectory>Directory: \dict\</filedirectory>
+<filenotes>Notes: Contains all application/object settings for package</filenotes>
+</adempiereDocument>
