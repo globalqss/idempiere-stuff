@@ -58,7 +58,8 @@ then
 fi
 NEXTID=`expr $ID + 1`
 echo $NEXTID > $FILE
-echo "$ID|$FORM_USER|$FORM_ALTKEY|$FORM_COMMENT" >> $FILELOG
+DATE=`date +'%Y/%m/%d %H:%M:%S'`
+echo "$ID|$FORM_USER|$DATE|$FORM_ALTKEY|$FORM_COMMENT" >> $FILELOG
 rm $FILELOCK
 
 echo "$ID"
