@@ -1,0 +1,21 @@
+#!/bin/sh
+
+. ./bashlib
+
+CAT=/bin/cat
+
+echo Content-type: text/plain
+echo ""
+
+if [ "x$FORM_PROJECT" = "x" -o "x$FORM_TABLE" = "x" ]
+then
+    echo "ERROR: Required parameters table, project"
+    exit 1
+fi
+
+FILELOCK=../data/${FORM_PROJECT}/${FORM_TABLE}.lock
+if [ -r $FILELOCK ]
+then
+        rm -f $FILELOCK
+fi
+echo rm -f $FILELOCK

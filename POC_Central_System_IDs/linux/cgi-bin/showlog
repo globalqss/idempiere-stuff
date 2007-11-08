@@ -1,12 +1,30 @@
 #!/bin/sh
+
+. ./bashlib
+
 CAT=/bin/cat
 
 echo Content-type: text/plain
 echo ""
 
-if [[ -x $CAT ]]
+if [ "x$FORM_PROJECT" = "x" ]
 then
-        $CAT ../data/$1.log
+    FORM_PROJECT="Adempiere" # default
+fi
+
+if [ "x$FORM_TABLE" = "x" ]
+then
+    FORM_TABLE=$1
+    if [ "x$FORM_TABLE" = "x" ]
+    then
+        echo "ERROR: Required parameter table"
+        exit 1
+    fi
+fi
+
+if [ -x $CAT ]
+then
+        $CAT ../data/${FORM_PROJECT}/${FORM_TABLE}.log
 else
-        echo Cannot find command on this system.
+        echo Cannot find command $CAT on this system.
 fi

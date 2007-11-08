@@ -143,17 +143,57 @@ public class MSequence extends X_AD_Sequence
 						+ ")");
 				if (rs.next())
 				{
+					
+					// Get the table
+					MTable table = MTable.get(Env.getCtx(), TableName);
+					boolean hasEntityType = false;
+					if (table.getColumn("EntityType") != null)
+						hasEntityType = true;
+					
 					int AD_Sequence_ID = rs.getInt(4);
+					boolean gotFromHTTP = false;
+
+					// If maintaining official dictionary try to get the ID from http official server
 					if (adempiereSys) {
-						// get ID from http site
-						retValue = getNextID_HTTP(TableName);
-						PreparedStatement updateSQL;
-						updateSQL = conn.prepareStatement("UPDATE AD_Sequence SET CurrentNextSys = ? + 1 WHERE AD_Sequence_ID = ?");
-						updateSQL.setInt(1, retValue);
-						updateSQL.setInt(2, AD_Sequence_ID);
-						updateSQL.executeUpdate();
-						updateSQL.close();
-					} else {
+
+						String isUseCentralizedID = MSysConfig.getValue("DICTIONARY_ID_USE_CENTRALIZED_ID"); // "Y"
+						if (isUseCentralizedID != null && isUseCentralizedID.equals("Y")) {
+							// get ID from http site
+							retValue = getNextOfficialID_HTTP(TableName);
+							if (retValue > 0) {
+								PreparedStatement updateSQL;
+								updateSQL = conn.prepareStatement("UPDATE AD_Sequence SET CurrentNextSys = ? + 1 WHERE AD_Sequence_ID = ?");
+								updateSQL.setInt(1, retValue);
+								updateSQL.setInt(2, AD_Sequence_ID);
+								updateSQL.executeUpdate();
+								updateSQL.close();
+							}
+							gotFromHTTP = true;
+						}
+
+					}
+
+					// If not official dictionary try to get the ID from http custom server - if configured
+					if (hasEntityType && ! adempiereSys) {
+
+						String isUseProjectCentralizedID = MSysConfig.getValue("PROJECT_ID_USE_CENTRALIZED_ID"); // "Y"
+						if (isUseProjectCentralizedID != null && isUseProjectCentralizedID.equals("Y")) {
+							// get ID from http site
+							retValue = getNextProjectID_HTTP(TableName);
+							if (retValue > 0) {
+								PreparedStatement updateSQL;
+								updateSQL = conn.prepareStatement("UPDATE AD_Sequence SET CurrentNext = ? + 1 WHERE AD_Sequence_ID = ?");
+								updateSQL.setInt(1, retValue);
+								updateSQL.setInt(2, AD_Sequence_ID);
+								updateSQL.executeUpdate();
+								updateSQL.close();
+							}
+							gotFromHTTP = true;
+						}
+
+					}
+					
+					if (! gotFromHTTP) {
 						//
 						if (USE_PROCEDURE)
 						{
@@ -1180,28 +1220,58 @@ public class MSequence extends X_AD_Sequence
 	}	//	GetIDs
 	
 	/**
-	 *	Get next number for Key column = 0 is Error.
+	 *	Get next number for Key column
 	 *  @param AD_Client_ID client
 	 *  @param TableName table name
 	 * 	@param trxName optional Transaction Name
-	 *  @return next no or (-1=not found, -2=error)
+	 *  @return next no or (-1=error)
 	 */
-	public static synchronized int getNextID_HTTP (String TableName)
+	public static synchronized int getNextOfficialID_HTTP (String TableName)
 	{
-		int retValue = -1;
-		StringBuffer read = new StringBuffer("");
-		String website = MSysConfig.getValue("DICT_WEBSITE"); // "http://adempiere.globalqss.com/cgi-bin/get_ID";
-		// TODO: Implement httpd authentication	
-		String prm_USER = MSysConfig.getValue("DICT_USER");  // "globalqss";
-		String prm_PASSWORD = MSysConfig.getValue("DICT_PASSWORD");  // "password_inseguro";
+		String website = MSysConfig.getValue("DICTIONARY_ID_WEBSITE"); // "http://developer.adempiere.com/cgi-bin/get_ID";
+		String prm_USER = MSysConfig.getValue("DICTIONARY_ID_USER");  // "globalqss";
+		String prm_PASSWORD = MSysConfig.getValue("DICTIONARY_ID_PASSWORD");  // "password_inseguro";
 		String prm_TABLE = TableName;
 		String prm_ALTKEY = "";  // TODO: generate alt-key based on key of table
-		String prm_COMMENT = MSysConfig.getValue("DICT_COMMENTS");
+		String prm_COMMENT = MSysConfig.getValue("DICTIONARY_ID_COMMENTS");
+		String prm_PROJECT = new String("Adempiere");
+		
+		return getNextID_HTTP(TableName, website, prm_USER,
+				prm_PASSWORD, prm_TABLE, prm_ALTKEY, prm_COMMENT, prm_PROJECT);
+	}
+	
+	/**
+	 *	Get next number for Key column
+	 *  @param AD_Client_ID client
+	 *  @param TableName table name
+	 * 	@param trxName optional Transaction Name
+	 *  @return next no or (-1=error)
+	 */
+	public static synchronized int getNextProjectID_HTTP (String TableName)
+	{
+		String website = MSysConfig.getValue("PROJECT_ID_WEBSITE"); // "http://developer.adempiere.com/cgi-bin/get_ID";
+		String prm_USER = MSysConfig.getValue("PROJECT_ID_USER");  // "globalqss";
+		String prm_PASSWORD = MSysConfig.getValue("PROJECT_ID_PASSWORD");  // "password_inseguro";
+		String prm_TABLE = TableName;
+		String prm_ALTKEY = "";  // TODO: generate alt-key based on key of table
+		String prm_COMMENT = MSysConfig.getValue("PROJECT_ID_COMMENTS");
+		String prm_PROJECT = MSysConfig.getValue("PROJECT_ID_PROJECT");
+		
+		return getNextID_HTTP(TableName, website, prm_USER,
+				prm_PASSWORD, prm_TABLE, prm_ALTKEY, prm_COMMENT, prm_PROJECT);
+	}
 
+	private static int getNextID_HTTP(String TableName,
+			String website, String prm_USER, String prm_PASSWORD,
+			String prm_TABLE, String prm_ALTKEY, String prm_COMMENT,
+			String prm_PROJECT) {
+		StringBuffer read = new StringBuffer("");
+		int retValue = -1;
 		try {
 			String completeUrl = website + "?" + "USER="
 					+ URLEncoder.encode(prm_USER, "UTF-8") + "&PASSWORD="
-					+ URLEncoder.encode(prm_PASSWORD, "UTF-8") + "&TABLE="
+					+ URLEncoder.encode(prm_PASSWORD, "UTF-8") + "&PROJECT="
+					+ URLEncoder.encode(prm_PROJECT, "UTF-8") + "&TABLE="
 					+ URLEncoder.encode(prm_TABLE, "UTF-8") + "&ALTKEY="
 					+ URLEncoder.encode(prm_ALTKEY, "UTF-8") + "&COMMENT="
 					+ URLEncoder.encode(prm_COMMENT, "UTF-8");
@@ -1248,7 +1318,7 @@ public class MSequence extends X_AD_Sequence
 			System.err.println(e);
 			retValue = -1;
 		}
-		s_log.log(Level.INFO, "getNextID_HTTP - " + TableName + "=" + read + "(" + retValue + ")"); 
+		s_log.log(Level.WARNING, "getNextID_HTTP - " + TableName + "=" + read + "(" + retValue + ")"); 
 	    
 		return retValue;
 	}
