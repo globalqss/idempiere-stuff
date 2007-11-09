@@ -56,19 +56,26 @@ do
 done
 > $FILELOCK
 
+if [ "x$FORM_PROJECT" = "xAdempiere" ]
+then
+    INITIALID=50000
+else
+    INITIALID=1000000
+fi
+
 if [ -s $FILE ]
 then
     ID=`cat $FILE`
 else
-    ID=50000
+    ID=$INITIALID
 fi
 if [ "x$ID" = x ]
 then
-    ID=50000
+    ID=$INITIALID
 fi
-if [ "$ID" -lt 50000 ]
+if [ "$ID" -lt $INITIALID ]
 then
-    ID=50000
+    ID=$INITIALID
 fi
 while true
 do
