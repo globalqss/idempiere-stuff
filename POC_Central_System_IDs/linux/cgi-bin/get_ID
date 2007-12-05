@@ -8,6 +8,8 @@
 # Changelog:
 #  2007/11/08 - Carlos Ruiz (globalqss)
 #       Add custom project management of sequences
+#  2007/12/05 - Carlos Ruiz (globalqss)
+#       Add generation of file to notify
 
 . ./bashlib
 
@@ -49,6 +51,7 @@ fi
 FILE=../data/${FORM_PROJECT}/${FORM_TABLE}.seq
 FILELOCK=../data/${FORM_PROJECT}/${FORM_TABLE}.lock
 FILELOG=../data/${FORM_PROJECT}/${FORM_TABLE}.log
+FILENOTIFY=../data/${FORM_PROJECT}/${FORM_PROJECT}.notify
 
 while [ -r $FILELOCK ]
 do
@@ -90,6 +93,7 @@ done
 echo $NEXTID > $FILE
 DATE=`date +'%Y/%m/%d %H:%M:%S'`
 echo "$ID|$FORM_USER|$DATE|$FORM_ALTKEY|$FORM_COMMENT" >> $FILELOG
+echo "Reserved ${FORM_TABLE}_ID $ID from $FORM_USER at $DATE : $FORM_COMMENT" >> $FILENOTIFY
 rm $FILELOCK
 
 echo "$ID"
