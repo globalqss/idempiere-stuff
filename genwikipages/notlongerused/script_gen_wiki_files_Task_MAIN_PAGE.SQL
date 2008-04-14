@@ -30,7 +30,7 @@ DECLARE
          || ' But please, always respecting copyright.';
    v_str_text_main2           VARCHAR (500)
                              := 'Please write your contributions 
-under the ';                   -- will be concatenated with v_str_text_section
+UNDER THE ';                   -- will be concatenated with v_str_text_section
    v_str_text_section         VARCHAR (20)       := 'Section';
    v_str_contribution_title   VARCHAR (80)       := 'Contributions';
    v_str_onlinehelp_title     VARCHAR (80)       := 'On Line Help';
@@ -38,19 +38,19 @@ under the ';                   -- will be concatenated with v_str_text_section
 /* END REPLACE THIS VALUE WITH YOU NEED */
    v_str_man_index            VARCHAR (200);
    str_end                    VARCHAR (5);
-   f                          UTL_FILE.file_type;
+   f                          UTL_FILE.FILE_TYPE;
    v_file                     VARCHAR (80)       := ' ';
    v_tname                    VARCHAR (80);
    v_bold                     VARCHAR (3)        := ''''''''; -- For Bold Text
    v_ital                     VARCHAR (2)        := ''''''; -- For Italic Text
    v_flag_opentable           BOOLEAN;
 
-   CURSOR task
+   CURSOR TASK
    IS
       SELECT   m.ad_task_id, t.NAME
-          FROM ad_menu m, ad_task t
+          FROM AD_MENU m, AD_TASK t
          WHERE (m.ad_task_id = v_task_id OR v_task_id = 0)
-           AND m.entitytype = 'D'
+           AND m.ad_menu_id < 1000000
            AND m.action = 'T'
            AND m.isactive = 'Y'
            AND m.ad_task_id = t.ad_task_id
@@ -68,11 +68,11 @@ BEGIN
                     '[[Manual' || str_end || '|' || TRIM (v_str_return)
                     || ']]';
 
-   FOR t IN task
+   FOR t IN TASK
    LOOP
       SELECT NAME
         INTO v_tname
-        FROM ad_task
+        FROM AD_TASK
        WHERE ad_task_id = t.ad_task_id;             -- Get Task Name (English)
 
       IF SQL%ROWCOUNT = 0
@@ -83,7 +83,7 @@ BEGIN
       IF v_file <> ' '
       THEN
          -- Close previous file
-         UTL_FILE.fclose (f);
+         UTL_FILE.FCLOSE (f);
       END IF;
 
       -- fill the Name Page
@@ -91,12 +91,12 @@ BEGIN
             TRIM ('ManPageT_' || TRANSLATE (v_tname, '_&, /', '_'))
          || str_end
          || '.wiki';
-      f := UTL_FILE.fopen ('DIR_TEMP', v_file, 'w');
-      UTL_FILE.put_line (f, v_str_man_index);               -- Return To Index
-      UTL_FILE.put_line (f, ' ');
-      UTL_FILE.put_line (f, v_str_text_main);
-      UTL_FILE.put_line (f, ' ');
-      UTL_FILE.put_line (f,
+      f := UTL_FILE.FOPEN ('DIR_TEMP', v_file, 'w');
+      UTL_FILE.PUT_LINE (f, v_str_man_index);               -- Return To Index
+      UTL_FILE.PUT_LINE (f, ' ');
+      UTL_FILE.PUT_LINE (f, v_str_text_main);
+      UTL_FILE.PUT_LINE (f, ' ');
+      UTL_FILE.PUT_LINE (f,
                             v_str_text_main2
                          || '[[#'
                          || v_str_contribution_title
@@ -105,10 +105,10 @@ BEGIN
                          || ']] '
                          || v_str_text_section
                         );
-      UTL_FILE.put_line (f, ' ');
+      UTL_FILE.PUT_LINE (f, ' ');
       -- Insert Template to OnLineHelp
-      UTL_FILE.put_line (f, '<!-- Note to editors: NOT MODIFY THIS CODE -->');
-      UTL_FILE.put_line (f,
+      UTL_FILE.PUT_LINE (f, '<!-- Note to editors: NOT MODIFY THIS CODE -->');
+      UTL_FILE.PUT_LINE (f,
                             '{{:'
                          || TRIM (   'ManPageT_'
                                   || TRANSLATE (v_tname, '_&, /', '_')
@@ -117,14 +117,14 @@ BEGIN
                          || str_end
                          || '}}'
                         );
-      UTL_FILE.put_line (f,
+      UTL_FILE.PUT_LINE (f,
                          '<!-- END Note to editors: NOT MODIFY THIS CODE -->'
                         );
       --
       -- Insert Contributions Section
-      UTL_FILE.put_line (f, '=' || v_str_contribution_title || '=');
-      UTL_FILE.put_line (f, ' ');
-      UTL_FILE.put_line (f,
+      UTL_FILE.PUT_LINE (f, '=' || v_str_contribution_title || '=');
+      UTL_FILE.PUT_LINE (f, ' ');
+      UTL_FILE.PUT_LINE (f,
                             '[[Category:Manual|'
                          || SUBSTR (v_file, 8, 1)
                          || ' '
@@ -132,6 +132,6 @@ BEGIN
                          || ']]'
                         );
       --
-      UTL_FILE.fclose (f);
+      UTL_FILE.FCLOSE (f);
    END LOOP;                                                 --  FOR t IN Task
 END;

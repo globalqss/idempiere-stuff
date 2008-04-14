@@ -42,7 +42,7 @@ DECLARE
 /* END REPLACE THIS VALUE WITH YOU NEED */
    v_str_man_index         VARCHAR (200);
    str_end                 VARCHAR (5);
-   f                       UTL_FILE.file_type;
+   f                       UTL_FILE.FILE_TYPE;
    v_file_olh              VARCHAR (80)       := ' ';
    v_tname                 VARCHAR (80);
    v_imagename             VARCHAR (100);
@@ -51,18 +51,18 @@ DECLARE
    v_flag_opentable        BOOLEAN;
    v_ad_process_id         NUMBER;
 
-   CURSOR task                                                        -- TASK
+   CURSOR TASK                                                        -- TASK
    IS
-      SELECT   ttrl.ad_language, m.ad_menu_id, m.ad_task_id, ttrl.NAME,
+      SELECT   ttrl.AD_LANGUAGE, m.ad_menu_id, m.ad_task_id, ttrl.NAME,
                ttrl.description, ttrl.HELP, t.os_command
-          FROM ad_menu m, ad_task t, ad_task_trl ttrl
+          FROM AD_MENU m, AD_TASK t, AD_TASK_TRL ttrl
          WHERE (m.ad_task_id = v_task_id OR v_task_id = 0)
-           AND m.entitytype = 'D'
+           AND m.ad_menu_id < 1000000
            AND m.action = 'T'
            AND m.isactive = 'Y'
            AND m.ad_task_id = t.ad_task_id
            AND t.ad_task_id = ttrl.ad_task_id
-           AND ttrl.ad_language = v_language
+           AND ttrl.AD_LANGUAGE = v_language
       ORDER BY m.ad_task_id;
 BEGIN
    IF LOWER (SUBSTR (v_language, 1, 2)) <> 'en'
@@ -77,12 +77,12 @@ BEGIN
                     '[[Manual' || str_end || '|' || TRIM (v_str_return)
                     || ']]';
 
-   FOR t IN task
+   FOR t IN TASK
    LOOP
       -- Process Type
       SELECT NAME
         INTO v_tname
-        FROM ad_task
+        FROM AD_TASK
        WHERE ad_task_id = t.ad_task_id;             -- Get Task Name (English)
 
       IF SQL%ROWCOUNT = 0
@@ -93,8 +93,8 @@ BEGIN
       IF v_file_olh <> ' '
       THEN
          -- Close previous file
-         UTL_FILE.put_line (f, ' ');
-         UTL_FILE.fclose (f);
+         UTL_FILE.PUT_LINE (f, ' ');
+         UTL_FILE.FCLOSE (f);
       END IF;
 
       -- fill the Name Page
@@ -103,24 +103,24 @@ BEGIN
          || '_olh'
          || str_end
          || '.wiki';
-      f := UTL_FILE.fopen ('DIR_TEMP', v_file_olh, 'w');
-      UTL_FILE.put_line (f, ' ');
+      f := UTL_FILE.FOPEN ('DIR_TEMP', v_file_olh, 'w');
+      UTL_FILE.PUT_LINE (f, ' ');
       -- NO Modify Message to Editor
-      UTL_FILE.put_line (f, '<!-- ' || v_no_modify1 || ' -->');
-      UTL_FILE.put_line (f, '<!-- ' || v_no_modify2 || ' -->');
-      UTL_FILE.put_line (f, ' ');
+      UTL_FILE.PUT_LINE (f, '<!-- ' || v_no_modify1 || ' -->');
+      UTL_FILE.PUT_LINE (f, '<!-- ' || v_no_modify2 || ' -->');
+      UTL_FILE.PUT_LINE (f, ' ');
       -- End No Modify Message
-      UTL_FILE.put_line (f, '==' || v_str_typep || ': ' || t.NAME || '==');
-      UTL_FILE.put_line (f, ' ');
-      UTL_FILE.put_line (f,
+      UTL_FILE.PUT_LINE (f, '==' || v_str_typep || ': ' || t.NAME || '==');
+      UTL_FILE.PUT_LINE (f, ' ');
+      UTL_FILE.PUT_LINE (f,
                             v_bold
                          || v_str_desc_title
                          || ': '
                          || v_bold
                          || t.description
                         );
-      UTL_FILE.put_line (f, ' ');
-      UTL_FILE.put_line (f,
+      UTL_FILE.PUT_LINE (f, ' ');
+      UTL_FILE.PUT_LINE (f,
                             v_bold
                          || v_str_help_title
                          || ': '
@@ -128,12 +128,12 @@ BEGIN
                          || ' '
                          || t.HELP
                         );
-      UTL_FILE.put_line (f, ' ');
+      UTL_FILE.PUT_LINE (f, ' ');
 
       -- TECHNICAL DATA
       IF t.os_command IS NOT NULL
       THEN
-         UTL_FILE.put_line (f,
+         UTL_FILE.PUT_LINE (f,
                                '<small>'
                             || v_str_command_title
                             || t.os_command
@@ -143,23 +143,23 @@ BEGIN
       END IF;
 
       -- END TECHNICAL DATA
-      UTL_FILE.put_line (f, ' ');
+      UTL_FILE.PUT_LINE (f, ' ');
       -- For Image
       v_imagename :=
           'ManPageP_' || TRIM(TRANSLATE (v_tname, '_&, /', '_')) || str_end
           || '.png';
-      UTL_FILE.put_line (f, '[[Image:' || v_imagename || '|center' || ']]');
-      UTL_FILE.put_line (f, ' ');
+      UTL_FILE.PUT_LINE (f, '[[Image:' || v_imagename || '|center' || ']]');
+      UTL_FILE.PUT_LINE (f, ' ');
    -- End Image
    END LOOP;                                                 --  FOR Pr IN Pro
 
    IF v_flag_opentable
    THEN
       -- Table for Fields is Open -> Close Table
-      UTL_FILE.put_line (f, '|}');
+      UTL_FILE.PUT_LINE (f, '|}');
       v_flag_opentable := FALSE;
    END IF;
 
-   UTL_FILE.put_line (f, ' ');
-   UTL_FILE.fclose (f);
+   UTL_FILE.PUT_LINE (f, ' ');
+   UTL_FILE.FCLOSE (f);
 END;

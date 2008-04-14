@@ -43,8 +43,8 @@ DECLARE
 /* END REPLACE THIS VALUE WITH YOU NEED */
    v_str_man_index         VARCHAR (200);
    str_end                 VARCHAR (5);
-   f                       UTL_FILE.file_type;
-   f_main                  UTL_FILE.file_type;
+   f                       UTL_FILE.FILE_TYPE;
+   f_main                  UTL_FILE.FILE_TYPE;
    v_file_olh              VARCHAR (80)       := ' ';
    v_wname                 VARCHAR (80);
    v_nname                 VARCHAR (80);
@@ -59,32 +59,32 @@ DECLARE
 
    CURSOR c1
    IS   -- WORKFLOW 
-     SELECT    mtrl.AD_Language,
-	       'F' as type,
+     SELECT    mtrl.AD_LANGUAGE,
+	       'F' AS TYPE,
 		m.AD_MENU_ID, 
 		m.AD_PROCESS_ID,
-                0 as ad_wf_node_id,
+                0 AS ad_wf_node_id,
 		mtrl.NAME, 
 		mtrl.DESCRIPTION ,       
 		m.ad_workflow_id,
                 f.help,
-                0 as link_id,
-                m.name as linkname,
-                0 as ad_wf_next_id,
-                ' ' as action
+                0 AS link_id,
+                m.NAME AS linkname,
+                0 AS ad_wf_next_id,
+                ' ' AS action
  	   FROM AD_MENU m, AD_WORKFLOW f, AD_MENU_TRL mtrl
 	  WHERE (m.AD_WORKFLOW_ID = v_workflow_id OR v_workflow_id = 0)
-            AND mtrl.AD_language = v_language
-            AND m.entitytype = 'D'
-	    AND m.action = 'F' 
+            AND mtrl.AD_LANGUAGE = v_language
+            AND m.ad_menu_id < 1000000
+	        AND m.action = 'F' 
 	    AND m.isactive='Y'
             AND m.ad_workflow_id = f.ad_workflow_id
             AND m.ad_menu_id = mtrl.ad_menu_id
   
      UNION
         -- NODES
-	SELECT ntrl.AD_Language,
-		'N' as type,
+	SELECT ntrl.AD_LANGUAGE,
+		'N' AS TYPE,
 		0,
 		0,
 		n.AD_wf_node_ID,
@@ -98,24 +98,24 @@ DECLARE
                          NVL (n.ad_task_id, 0)
                       )
                    )
-                ) as lik_id,
-                NVL (w.name,
-                     NVL(p.name,
-                         NVL(o.name,
-                             NVL(t.name,n.name)
+                ) AS lik_id,
+                NVL (w.NAME,
+                     NVL(p.NAME,
+                         NVL(o.NAME,
+                             NVL(t.NAME,n.NAME)
                              )
                         )                   
-                     ) as linkname,                      
+                     ) AS linkname,                      
                 x.ad_wf_next_id,
                 n.action
-   	   FROM AD_WF_NODE n, AD_WF_NODE_TRL ntrl,ad_WF_NODENEXT x, ad_window w, ad_process p, ad_form o, ad_task t
+   	   FROM AD_WF_NODE n, AD_WF_NODE_TRL ntrl,AD_WF_NODENEXT x, AD_WINDOW w, AD_PROCESS p, AD_FORM o, AD_TASK t
    	   WHERE EXISTS (SELECT 1
                            FROM AD_MENU
-                          WHERE ad_menu.ad_workflow_id = n.ad_workflow_id 
-                            AND ad_menu.AD_MENU_ID <> 0)
+                          WHERE AD_MENU.ad_workflow_id = n.ad_workflow_id 
+                            AND AD_MENU.AD_MENU_ID <> 0)
             AND (n.AD_workflow_ID = v_workflow_id OR v_workflow_id = 0) 
             AND n.AD_wf_NODE_ID = ntrl.AD_wf_NODE_ID
-            AND ntrl.AD_Language = v_language
+            AND ntrl.AD_LANGUAGE = v_language
             AND n.isactive='Y'
             AND n.AD_wf_NODE_ID = x.AD_wf_NODE_ID(+)
             AND n.ad_process_id = p.ad_process_id(+)
@@ -143,7 +143,7 @@ BEGIN
          -- Workflow Type
          SELECT NAME
            INTO v_wname
-           FROM ad_workflow
+           FROM AD_WORKFLOW
           WHERE ad_workflow_id = r.ad_workflow_id;    -- Get Workflow Name (English)
 
          IF SQL%ROWCOUNT = 0
@@ -154,15 +154,15 @@ BEGIN
          IF v_flag_opentable 
          THEN
             -- New Workflow and Table for Nodes is Open -> Close Table
-            UTL_FILE.put_line (f, '|}');
+            UTL_FILE.PUT_LINE (f, '|}');
             v_flag_opentable := FALSE;
          END IF;
 
          IF v_file_olh <> ' '
          THEN
             -- Close previous file
-            UTL_FILE.put_line (f, ' ');
-          UTL_FILE.fclose (f);
+            UTL_FILE.PUT_LINE (f, ' ');
+          UTL_FILE.FCLOSE (f);
          END IF;
 
          -- fill the Name Page
@@ -171,27 +171,27 @@ BEGIN
             || '_olh'
             || str_end
             || '.wiki';
-         f := UTL_FILE.fopen ('DIR_TEMP', v_file_olh, 'w');
-         UTL_FILE.put_line (f, ' ');
+         f := UTL_FILE.FOPEN ('DIR_TEMP', v_file_olh, 'w');
+         UTL_FILE.PUT_LINE (f, ' ');
 
 	 -- NO Modify Message to Editor 
-         UTL_FILE.put_line (f, '<!-- ' || v_NO_MODIFY1 || ' -->');
-         UTL_FILE.put_line (f, '<!-- ' || v_NO_MODIFY2 || ' -->');
-         UTL_FILE.put_line (f, ' ');
+         UTL_FILE.PUT_LINE (f, '<!-- ' || v_NO_MODIFY1 || ' -->');
+         UTL_FILE.PUT_LINE (f, '<!-- ' || v_NO_MODIFY2 || ' -->');
+         UTL_FILE.PUT_LINE (f, ' ');
          -- End No Modify Message
 
-         UTL_FILE.put_line (f, '==' || v_str_typew || ': ' || r.NAME || '==');
+         UTL_FILE.PUT_LINE (f, '==' || v_str_typew || ': ' || r.NAME || '==');
 
-	 UTL_FILE.put_line (f, ' ');
-         UTL_FILE.put_line (f,
+	 UTL_FILE.PUT_LINE (f, ' ');
+         UTL_FILE.PUT_LINE (f,
                                v_bold
                             || v_str_desc_title
                             || ': '
                             || v_bold
                             || r.description
                            );
-         UTL_FILE.put_line (f, ' ');
-         UTL_FILE.put_line (f,
+         UTL_FILE.PUT_LINE (f, ' ');
+         UTL_FILE.PUT_LINE (f,
                                v_bold
                             || v_str_help_title
                             || ': '
@@ -199,7 +199,7 @@ BEGIN
                             || ' '
                             || r.HELP
                            );
-         UTL_FILE.put_line (f, ' ');
+         UTL_FILE.PUT_LINE (f, ' ');
       END IF;
 
 
@@ -210,25 +210,25 @@ BEGIN
          IF NOT v_flag_opentable
          THEN
            -- Open Table for Nodes
-           UTL_FILE.put_line (f, v_bold || v_str_typen || v_bold);
-           UTL_FILE.put_line (f, ' ');
-           UTL_FILE.put_line
+           UTL_FILE.PUT_LINE (f, v_bold || v_str_typen || v_bold);
+           UTL_FILE.PUT_LINE (f, ' ');
+           UTL_FILE.PUT_LINE
                (f,
                 '{|{| border="1" cellpadding="5" cellspacing="0" align="center"'
                );
-           UTL_FILE.put_line (f,
+           UTL_FILE.PUT_LINE (f,
                                  '!style="background:#efefef;" width="200"|'
                               || v_str_name_title
                              );
-           UTL_FILE.put_line (f,
+           UTL_FILE.PUT_LINE (f,
                                  '!style="background:#efefef;" width="150"|'
                               || v_str_desc_title
                              );
-           UTL_FILE.put_line (f,
+           UTL_FILE.PUT_LINE (f,
                                  '!style="background:#efefef;" width="300"|'
                               || v_str_help_title
                              );
-           UTL_FILE.put_line (f,
+           UTL_FILE.PUT_LINE (f,
                                  '!style="background:#efefef;" width="150"|'
                               || '<small>'
                               || v_str_technical_title
@@ -245,22 +245,22 @@ BEGIN
              
              IF r.action = 'P' THEN
                 SELECT NAME INTO v_name_lang FROM AD_PROCESS_TRL 
-                       WHERE AD_PROCESS_ID = r.link_id AND AD_language =  v_language;
+                       WHERE AD_PROCESS_ID = r.link_id AND AD_LANGUAGE =  v_language;
              END IF;
          
              IF r.action = 'T' THEN
                 SELECT NAME INTO v_name_lang FROM AD_TASK_TRL 
-                       WHERE AD_TASK_ID = r.link_id AND AD_language =  v_language;
+                       WHERE AD_TASK_ID = r.link_id AND AD_LANGUAGE =  v_language;
              END IF;
          
              IF r.action = 'W' THEN
                 SELECT NAME INTO v_name_lang FROM AD_WINDOW_TRL 
-                       WHERE AD_WINDOW_ID = r.link_id AND AD_language =  v_language;
+                       WHERE AD_WINDOW_ID = r.link_id AND AD_LANGUAGE =  v_language;
              END IF;
          
              IF r.action = 'X' THEN
                 SELECT NAME INTO v_name_lang FROM AD_FORM_TRL 
-                       WHERE AD_FORM_ID = r.link_id AND AD_language =  v_language;
+                       WHERE AD_FORM_ID = r.link_id AND AD_LANGUAGE =  v_language;
              END IF;
         
          END IF;   
@@ -271,15 +271,15 @@ BEGIN
          END IF;
        
         
-         UTL_FILE.put_line (f, '|-');
-         UTL_FILE.put_line (f, '|-valign="top"');
-         UTL_FILE.put_line (f,
+         UTL_FILE.PUT_LINE (f, '|-');
+         UTL_FILE.PUT_LINE (f, '|-valign="top"');
+         UTL_FILE.PUT_LINE (f,
                             '|' || v_ital || v_bold || r.NAME || v_bold
                             || v_ital
                            );
-         UTL_FILE.put_line (f, '||' || r.description);
-         UTL_FILE.put_line (f, '||' || r.HELP);
-         UTL_FILE.put_line (f, '|| ' || '<small>' || '[[ManPage'
+         UTL_FILE.PUT_LINE (f, '||' || r.description);
+         UTL_FILE.PUT_LINE (f, '||' || r.HELP);
+         UTL_FILE.PUT_LINE (f, '|| ' || '<small>' || '[[ManPage'
                             || UPPER(r.action)
                             || '_'
                             || TRIM (TRANSLATE (r.linkname, '_&, /', '_'))
@@ -288,8 +288,8 @@ BEGIN
                             || v_name_lang
                             || ']]');
          
-         UTL_FILE.put_line (f, '</small>');
-         UTL_FILE.put_line (f, '|-valign="top"');
+         UTL_FILE.PUT_LINE (f, '</small>');
+         UTL_FILE.PUT_LINE (f, '|-valign="top"');
       END IF;
  
    END LOOP;
@@ -297,15 +297,15 @@ BEGIN
    IF v_flag_opentable
    THEN
       -- Table for Nodes is Open -> Close Table
-      UTL_FILE.put_line (f, '|}');
+      UTL_FILE.PUT_LINE (f, '|}');
       v_flag_opentable := FALSE;
    END IF;
    
    IF v_file_olh <> ' '
    THEN
       -- Close previous file
-      UTL_FILE.put_line (f, ' ');
-      UTL_FILE.fclose (f);
+      UTL_FILE.PUT_LINE (f, ' ');
+      UTL_FILE.FCLOSE (f);
    END IF;
    
 END;

@@ -35,7 +35,7 @@ DECLARE
    v_lang2            VARCHAR (2)        := LOWER (SUBSTR (v_language, 1, 2));
    v_str_man_index    VARCHAR (200);
    str_end            VARCHAR (5);
-   f_main             UTL_FILE.file_type;
+   f_main             UTL_FILE.FILE_TYPE;
    v_file             VARCHAR (80)       := ' ';
    v_wname            VARCHAR (80);
    v_bold             VARCHAR (3)        := '''''''';         -- For Bold Text
@@ -69,18 +69,18 @@ DECLARE
                               )
                          )
                     ) AS technical
-            FROM ad_treenodemm t,
-                 ad_menu m,
-                 ad_process p,
-                 ad_form f,
-                 ad_task k
+            FROM AD_TREENODEMM t,
+                 AD_MENU m,
+                 AD_PROCESS p,
+                 AD_FORM f,
+                 AD_TASK k
            WHERE t.ad_tree_id = 10
              AND t.node_id = m.ad_menu_id
              AND m.ad_process_id = p.ad_process_id(+)
              AND m.ad_form_id = f.ad_form_id(+)
              AND m.ad_task_id = k.ad_task_id(+)
              AND m.isactive = 'Y'
-             AND m.entitytype = 'D'
+             AND m.ad_menu_id < 1000000
       CONNECT BY NOCYCLE PRIOR t.node_id = t.parent_id
       START WITH t.parent_id = 0 OR parent_id IS NULL
         ORDER SIBLINGS BY t.seqno;
@@ -94,16 +94,16 @@ BEGIN
 
    v_file := 'Manual_' || v_currentversion || str_end || '.wiki';
    -- Generate Main Page
-   f_main := UTL_FILE.fopen ('DIR_TEMP', v_file, 'w');
+   f_main := UTL_FILE.FOPEN ('DIR_TEMP', v_file, 'w');
    v_flag_opentable := FALSE;
-   UTL_FILE.put_line (f_main, v_str_msg1);
-   UTL_FILE.put_line (f_main, v_str_msg2);
-   UTL_FILE.put_line (f_main, v_str_msg3);
-   UTL_FILE.put_line (f_main, v_str_msg4);
-   UTL_FILE.put_line (f_main, ' ');
-   UTL_FILE.put_line (f_main, '[[Image:ManPageM_MainMenu.png]]');
-   UTL_FILE.put_line (f_main, ' ');
-   UTL_FILE.put_line (f_main,
+   UTL_FILE.PUT_LINE (f_main, v_str_msg1);
+   UTL_FILE.PUT_LINE (f_main, v_str_msg2);
+   UTL_FILE.PUT_LINE (f_main, v_str_msg3);
+   UTL_FILE.PUT_LINE (f_main, v_str_msg4);
+   UTL_FILE.PUT_LINE (f_main, ' ');
+   UTL_FILE.PUT_LINE (f_main, '[[Image:ManPageM_MainMenu.png]]');
+   UTL_FILE.PUT_LINE (f_main, ' ');
+   UTL_FILE.PUT_LINE (f_main,
                       '<center><small>' || v_str_modify || '</small></center>'
                      );
 
@@ -121,34 +121,34 @@ BEGIN
          IF v_flag_opentable
          THEN
             -- Table is Open -> Close Table
-            UTL_FILE.put_line (f_main, '|}');
+            UTL_FILE.PUT_LINE (f_main, '|}');
             v_flag_opentable := FALSE;
          END IF;
 
          IF r.levelparent = 0
          THEN
             -- Insert Empty Line
-            UTL_FILE.put_line (f_main, ' ');
-            UTL_FILE.put_line (f_main, ' ');
+            UTL_FILE.PUT_LINE (f_main, ' ');
+            UTL_FILE.PUT_LINE (f_main, ' ');
          END IF;
 
          -- Title
-         UTL_FILE.put_line (f_main, v_str_sec || TRIM (r.NAME) || v_str_sec);
-         UTL_FILE.put_line (f_main, ' ');
+         UTL_FILE.PUT_LINE (f_main, v_str_sec || TRIM (r.NAME) || v_str_sec);
+         UTL_FILE.PUT_LINE (f_main, ' ');
       ELSE
          -- Table Format
          IF NOT v_flag_opentable
          THEN
             v_flag_opentable := TRUE;
             -- Flag activated to indicate Table is Open
-            UTL_FILE.put_line (f_main, '{|');
-            UTL_FILE.put_line (f_main, '|-');
+            UTL_FILE.PUT_LINE (f_main, '{|');
+            UTL_FILE.PUT_LINE (f_main, '|-');
          END IF;                                       --  IF v_flag_openTable
 
          v_str_dot :=
                  TRIM (LPAD (' ', ((r.levelparent + 1) * (r.LEVEL - 2)), '.'));
-         UTL_FILE.put_line (f_main, '|-valign="top"');
-         UTL_FILE.put_line (f_main,
+         UTL_FILE.PUT_LINE (f_main, '|-valign="top"');
+         UTL_FILE.PUT_LINE (f_main,
                                '|width="280"|'
                             || '[[ManPage'
                             || UPPER (r.TYPE)
@@ -161,19 +161,19 @@ BEGIN
                             || r.NAME
                             || ']]'
                            );
-         UTL_FILE.put_line
+         UTL_FILE.PUT_LINE
                       (f_main,
                           '|width="80"|<span style="font-variant:small-caps">'
                        || r.action
                        || '</span>'
                       );
-         UTL_FILE.put_line (f_main,
+         UTL_FILE.PUT_LINE (f_main,
                             '|width="450"|<small>' || r.technical
                             || '</small>'
                            );
-         UTL_FILE.put_line (f_main, '|-valign="top"');
-         UTL_FILE.put_line (f_main, '|-');
-         UTL_FILE.put_line (f_main, ' ');
+         UTL_FILE.PUT_LINE (f_main, '|-valign="top"');
+         UTL_FILE.PUT_LINE (f_main, '|-');
+         UTL_FILE.PUT_LINE (f_main, ' ');
       END IF;                                         --  IF r.issummary = 'Y'
    --
    END LOOP;
@@ -181,13 +181,13 @@ BEGIN
    IF v_flag_opentable
    THEN
       -- Table is Open -> Close Table
-      UTL_FILE.put_line (f_main, '|}');
+      UTL_FILE.PUT_LINE (f_main, '|}');
    END IF;
 
-   UTL_FILE.put_line (f_main, ' ');
-   UTL_FILE.put_line (f_main,
+   UTL_FILE.PUT_LINE (f_main, ' ');
+   UTL_FILE.PUT_LINE (f_main,
                       '[[Category:Developer documentation]]'
                      );
-   UTL_FILE.put_line (f_main, ' ');
-   UTL_FILE.fclose (f_main);
+   UTL_FILE.PUT_LINE (f_main, ' ');
+   UTL_FILE.FCLOSE (f_main);
 END;
