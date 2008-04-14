@@ -15,7 +15,7 @@ AS
                FROM AD_WINDOW
               WHERE AD_WINDOW.ad_window_id = vt.ad_window_id
                 AND AD_WINDOW.isactive = 'Y'
-                AND AD_WINDOW.entitytype = 'D')
+                AND AD_WINDOW_id < 1000000)
    UNION
    SELECT t.AD_LANGUAGE, t.ad_window_id, t.ad_tab_id, 0, 'T', t.NAME,
           t.description, t.HELP, t.seqno, 0, tt.tablename, '', '', '', ''
@@ -25,10 +25,10 @@ AS
                FROM AD_TAB, AD_WINDOW
               WHERE AD_TAB.ad_tab_id = t.ad_tab_id
                 AND AD_TAB.isactive = 'Y'
-                AND AD_TAB.entitytype = 'D'
+                AND AD_TAB.ad_tab_id < 1000000
                 AND AD_TAB.ad_window_id = AD_WINDOW.ad_window_id
                 AND AD_WINDOW.isactive = 'Y'
-                AND AD_WINDOW.entitytype = 'D')
+                AND AD_WINDOW.ad_window_id < 1000000)
       AND t.ad_table_id = tt.ad_table_id
       AND UPPER (tt.tablename) = ut.table_name
    UNION
@@ -41,10 +41,10 @@ AS
                FROM AD_TAB, AD_WINDOW
               WHERE AD_TAB.ad_tab_id = t.ad_tab_id
                 AND AD_TAB.isactive = 'Y'
-                AND AD_TAB.entitytype = 'D'
+                AND AD_TAB.ad_tab_id < 1000000
                 AND AD_TAB.ad_window_id = AD_WINDOW.ad_window_id
                 AND AD_WINDOW.isactive = 'Y'
-                AND AD_WINDOW.entitytype = 'D')
+                AND AD_WINDOW.ad_window_id < 1000000)
       AND t.ad_table_id = tt.ad_table_id
       AND UPPER (tt.tablename) = uv.view_name
    UNION
@@ -80,13 +80,13 @@ AS
                FROM AD_FIELD, AD_TAB, AD_WINDOW
               WHERE AD_FIELD.ad_tab_id = f.ad_tab_id
                 AND AD_FIELD.isactive = 'Y'
-                AND AD_FIELD.entitytype = 'D'
+                AND AD_FIELD.ad_field_id < 1000000
                 AND AD_TAB.ad_tab_id = AD_FIELD.ad_tab_id
                 AND AD_TAB.isactive = 'Y'
-                AND AD_TAB.entitytype = 'D'
+                AND AD_TAB.ad_tab_id < 1000000
                 AND AD_TAB.ad_window_id = AD_WINDOW.ad_window_id
                 AND AD_WINDOW.isactive = 'Y'
-                AND AD_WINDOW.entitytype = 'D')
+                AND AD_WINDOW.ad_window_id < 1000000)
       AND t.isactive = 'Y'
       AND t.ad_table_id = tt.ad_table_id
       AND UPPER (tt.tablename) = ut.table_name
@@ -127,13 +127,13 @@ AS
                FROM AD_FIELD, AD_TAB, AD_WINDOW
               WHERE AD_FIELD.ad_tab_id = f.ad_tab_id
                 AND AD_FIELD.isactive = 'Y'
-                AND AD_FIELD.entitytype = 'D'
+                AND AD_FIELD.ad_field_id < 1000000
                 AND AD_TAB.ad_tab_id = AD_FIELD.ad_tab_id
                 AND AD_TAB.isactive = 'Y'
-                AND AD_TAB.entitytype = 'D'
+                AND AD_TAB.ad_tab_id < 1000000
                 AND AD_TAB.ad_window_id = AD_WINDOW.ad_window_id
                 AND AD_WINDOW.isactive = 'Y'
-                AND AD_WINDOW.entitytype = 'D')
+                AND AD_WINDOW.ad_window_id < 1000000)
       AND t.isactive = 'Y'
       AND t.ad_table_id = tt.ad_table_id
       AND UPPER (tt.tablename) = uv.view_name
@@ -146,7 +146,7 @@ AS
           NAME, description, HELP, 0 seqtab, 0 seqfld, '' dbtable,
           '' dbcolumn, '' dbtype, '' compieretype, isbetafunctionality
      FROM AD_WINDOW
-    WHERE isactive = 'Y' AND entitytype = 'D'
+    WHERE isactive = 'Y' AND ad_window_id < 1000000
    UNION
    SELECT 'en_US_base', t.ad_window_id, t.ad_tab_id, 0, 'T', t.NAME,
           t.description, t.HELP, t.seqno, 0, tt.tablename, '', '', '', ''
@@ -154,10 +154,10 @@ AS
     WHERE t.isactive = 'Y'
       AND t.ad_table_id = tt.ad_table_id
       AND UPPER (tt.tablename) = ut.table_name
-      AND t.entitytype = 'D'
+      AND t.ad_tab_id < 1000000
       AND t.ad_window_id = AD_WINDOW.ad_window_id
       AND AD_WINDOW.isactive = 'Y'
-      AND AD_WINDOW.entitytype = 'D'
+      AND AD_WINDOW.ad_window_id < 1000000
    UNION
 -- When are views
    SELECT 'en_US_base', t.ad_window_id, t.ad_tab_id, 0, 'T', t.NAME,
@@ -166,10 +166,10 @@ AS
     WHERE t.isactive = 'Y'
       AND t.ad_table_id = tt.ad_table_id
       AND UPPER (tt.tablename) = uv.view_name
-      AND t.entitytype = 'D'
+      AND t.ad_tab_id < 1000000
       AND t.ad_window_id = AD_WINDOW.ad_window_id
       AND AD_WINDOW.isactive = 'Y'
-      AND AD_WINDOW.entitytype = 'D'
+      AND AD_WINDOW.ad_window_id < 1000000
    UNION
    SELECT 'en_US_base', t.ad_window_id, t.ad_tab_id, f.ad_field_id, 'F',
           f.NAME, f.description, f.HELP, t.seqno, f.seqno, tt.tablename,
@@ -206,10 +206,10 @@ AS
       AND f.ad_column_id = cc.ad_column_id
       AND UPPER (tt.tablename) = uc.table_name
       AND UPPER (cc.columnname) = uc.column_name
-      AND f.entitytype = 'D'
+      AND f.ad_field_id < 1000000
       AND t.ad_window_id = AD_WINDOW.ad_window_id
       AND AD_WINDOW.isactive = 'Y'
-      AND AD_WINDOW.entitytype = 'D'
+      AND AD_WINDOW.ad_window_id < 1000000
    UNION
 -- When are views
    SELECT 'en_US_base', t.ad_window_id, t.ad_tab_id, f.ad_field_id, 'F',
@@ -247,7 +247,7 @@ AS
       AND f.ad_column_id = cc.ad_column_id
       AND UPPER (tt.tablename) = uc.table_name
       AND UPPER (cc.columnname) = uc.column_name
-      AND f.entitytype = 'D'
+      AND f.ad_field_id < 1000000
       AND t.ad_window_id = AD_WINDOW.ad_window_id
       AND AD_WINDOW.isactive = 'Y'
-      AND AD_WINDOW.entitytype = 'D'
+      AND AD_WINDOW.ad_window_id < 1000000
