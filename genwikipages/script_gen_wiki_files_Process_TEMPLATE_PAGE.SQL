@@ -49,7 +49,7 @@ DECLARE
 /* END REPLACE THIS VALUE WITH YOU NEED */
    v_str_man_index          VARCHAR (200);
    str_end                  VARCHAR (5);
-   f                        UTL_FILE.file_type;
+   f                        UTL_FILE.FILE_TYPE;
    v_file_olh               VARCHAR (80)       := ' ';
    v_pname                  VARCHAR (80);
    v_imagename              VARCHAR (100);
@@ -63,9 +63,9 @@ DECLARE
       SELECT   'es_US_base', 'P' AS TYPE, m.ad_menu_id, m.ad_process_id,
                m.NAME, m.description, p.HELP, rv.NAME AS repviewname,
                p.procedurename, p.classname, p.VALUE AS searchkey, p.ISBETAFUNCTIONALITY
-          FROM ad_menu m, ad_process p, ad_reportview rv
+          FROM AD_MENU m, AD_PROCESS p, AD_REPORTVIEW rv
          WHERE (m.ad_process_id = v_process_id OR v_process_id = 0)
-           AND m.entitytype = 'D'
+           AND m.ad_menu_id < 1000000
            AND m.action = 'P'
            AND m.isactive = 'Y'
            AND m.ad_process_id = p.ad_process_id
@@ -80,10 +80,10 @@ DECLARE
                                            pp.defaultvalue2,       -- not used
                                                             pp.columnname,
                pp.ad_element_id,                                   -- not used
-                                dba_displaytype (pp.ad_reference_id) dbtype
-          FROM ad_process_para pp
+                                Dba_Displaytype (pp.ad_reference_id) dbtype
+          FROM AD_PROCESS_PARA pp
          WHERE pp.isactive = 'Y'
-           AND pp.entitytype = 'D'
+           AND pp.ad_process_para_id < 1000000
            AND pp.ad_process_id = v_ad_process_id
       ORDER BY seqno;
 BEGIN
@@ -104,7 +104,7 @@ BEGIN
       -- Process Type
       SELECT NAME
         INTO v_pname
-        FROM ad_process
+        FROM AD_PROCESS
        WHERE ad_process_id = pr.ad_process_id;    -- Get Window Name (English)
 
       IF SQL%ROWCOUNT = 0
@@ -115,15 +115,15 @@ BEGIN
       IF v_flag_opentable
       THEN
          -- New Window and Table for Parameters is Open -> Close Table
-         UTL_FILE.put_line (f, '|}');
+         UTL_FILE.PUT_LINE (f, '|}');
          v_flag_opentable := FALSE;
       END IF;
 
       IF v_file_olh <> ' '
       THEN
          -- Close previous file
-         UTL_FILE.put_line (f, ' ');
-         UTL_FILE.fclose (f);
+         UTL_FILE.PUT_LINE (f, ' ');
+         UTL_FILE.FCLOSE (f);
       END IF;
 
       -- fill the Name Page
@@ -132,37 +132,37 @@ BEGIN
          || '_olh'
          || str_end
          || '.wiki';
-      f := UTL_FILE.fopen ('DIR_TEMP', v_file_olh, 'w');
-      UTL_FILE.put_line (f, ' ');
+      f := UTL_FILE.FOPEN ('DIR_TEMP', v_file_olh, 'w');
+      UTL_FILE.PUT_LINE (f, ' ');
       -- NO Modify Message to Editor
-      UTL_FILE.put_line (f, '<!-- ' || v_no_modify1 || ' -->');
-      UTL_FILE.put_line (f, '<!-- ' || v_no_modify2 || ' -->');
-      UTL_FILE.put_line (f, ' ');
+      UTL_FILE.PUT_LINE (f, '<!-- ' || v_no_modify1 || ' -->');
+      UTL_FILE.PUT_LINE (f, '<!-- ' || v_no_modify2 || ' -->');
+      UTL_FILE.PUT_LINE (f, ' ');
       -- End No Modify Message
-      UTL_FILE.put_line (f, '==' || v_str_typep || ': ' || pr.NAME || '==');
-      UTL_FILE.put_line (f, ' ');
+      UTL_FILE.PUT_LINE (f, '==' || v_str_typep || ': ' || pr.NAME || '==');
+      UTL_FILE.PUT_LINE (f, ' ');
 
       IF pr.ISBETAFUNCTIONALITY = 'Y'
       THEN
 	-- Msg. Beta Functionality (Red & Bold - centered)
-	UTL_FILE.put_line (f, '<center><font color="#FF0000">' 
+	UTL_FILE.PUT_LINE (f, '<center><font color="#FF0000">' 
 	       	              || v_bold
 			      || v_BetaFunctionality
 			      || v_bold
 			      || '</font></center>'
 			    );
-	   UTL_FILE.put_line (f, ' ');
+	   UTL_FILE.PUT_LINE (f, ' ');
       END IF; -- IF pr.ISBETAFUNCTIONALITY = 'Y'
 
-      UTL_FILE.put_line (f,
+      UTL_FILE.PUT_LINE (f,
                             v_bold
                          || v_str_desc_title
                          || ': '
                          || v_bold
                          || pr.description
                         );
-      UTL_FILE.put_line (f, ' ');
-      UTL_FILE.put_line (f,
+      UTL_FILE.PUT_LINE (f, ' ');
+      UTL_FILE.PUT_LINE (f,
                             v_bold
                          || v_str_help_title
                          || ': '
@@ -170,12 +170,12 @@ BEGIN
                          || ' '
                          || pr.HELP
                         );
-      UTL_FILE.put_line (f, ' ');
+      UTL_FILE.PUT_LINE (f, ' ');
 
       -- TECHNICAL DATA
       IF pr.procedurename IS NOT NULL
       THEN
-         UTL_FILE.put_line (f,
+         UTL_FILE.PUT_LINE (f,
                                '<small>'
                             || v_str_procedname_title
                             || pr.procedurename
@@ -186,7 +186,7 @@ BEGIN
 
       IF pr.classname IS NOT NULL
       THEN
-         UTL_FILE.put_line (f,
+         UTL_FILE.PUT_LINE (f,
                                '<small>'
                             || v_str_classname_title
                             || pr.classname
@@ -197,7 +197,7 @@ BEGIN
 
       IF pr.repviewname IS NOT NULL
       THEN
-         UTL_FILE.put_line (f,
+         UTL_FILE.PUT_LINE (f,
                                '<small>'
                             || v_str_repvname_title
                             || pr.repviewname
@@ -207,13 +207,13 @@ BEGIN
       END IF;
 
       -- END TECHNICAL DATA
-      UTL_FILE.put_line (f, ' ');
+      UTL_FILE.PUT_LINE (f, ' ');
       -- For Image
       v_imagename :=
           'ManPageP_' ||TRIM(TRANSLATE (v_pname, '_&, /', '_')) || str_end
           || '.png';
-      UTL_FILE.put_line (f, '[[Image:' || v_imagename || '|center' || ']]');
-      UTL_FILE.put_line (f, ' ');
+      UTL_FILE.PUT_LINE (f, '[[Image:' || v_imagename || '|center' || ']]');
+      UTL_FILE.PUT_LINE (f, ' ');
       -- End Image
       -- PARAMETERS
       v_ad_process_id := pr.ad_process_id;
@@ -222,31 +222,31 @@ BEGIN
       LOOP
          IF NOT v_flag_opentable
          THEN
-            UTL_FILE.put_line (f, ' ');
-            UTL_FILE.put_line (f, v_bold || v_str_parameters_title || v_bold);
-            UTL_FILE.put_line
+            UTL_FILE.PUT_LINE (f, ' ');
+            UTL_FILE.PUT_LINE (f, v_bold || v_str_parameters_title || v_bold);
+            UTL_FILE.PUT_LINE
                (f,
                 '{|{| border="1" cellpadding="5" cellspacing="0" align="center"'
                );
-            UTL_FILE.put_line (f,
+            UTL_FILE.PUT_LINE (f,
                                   '!style="background:#efefef;" width="150"|'
                                || '<small>'
                                || v_str_name_title
                                || '</small>'
                               );
-            UTL_FILE.put_line (f,
+            UTL_FILE.PUT_LINE (f,
                                   '!style="background:#efefef;" width="250"|'
                                || '<small>'
                                || v_str_desc_title
                                || '</small>'
                               );
-            UTL_FILE.put_line (f,
+            UTL_FILE.PUT_LINE (f,
                                   '!style="background:#efefef;" width="300"|'
                                || '<small>'
                                || v_str_help_title
                                || '</small>'
                               );
-            UTL_FILE.put_line (f,
+            UTL_FILE.PUT_LINE (f,
                                   '!style="background:#efefef;" width="80"|'
                                || '<small>'
                                || v_str_technical_title
@@ -256,26 +256,26 @@ BEGIN
          -- Flag activated to indicate Table is Open
          END IF;                                   --  IF NOT v_flag_openTable
 
-         UTL_FILE.put_line (f, '|-');
-         UTL_FILE.put_line (f, '|-valign="top"');
-         UTL_FILE.put_line (f,
+         UTL_FILE.PUT_LINE (f, '|-');
+         UTL_FILE.PUT_LINE (f, '|-valign="top"');
+         UTL_FILE.PUT_LINE (f,
                             '|' || v_ital || v_bold || pa.NAME || v_bold
                             || v_ital
                            );
-         UTL_FILE.put_line (f, '||' || pa.description);
-         UTL_FILE.put_line (f, '||' || pa.HELP);
-         UTL_FILE.put_line (f, '|| ' || '<small>' || pa.columnname);
-         UTL_FILE.put_line (f, ' ');
-         UTL_FILE.put_line (f, pa.dbtype);
-         UTL_FILE.put_line (f, ' ');
+         UTL_FILE.PUT_LINE (f, '||' || pa.description);
+         UTL_FILE.PUT_LINE (f, '||' || pa.HELP);
+         UTL_FILE.PUT_LINE (f, '|| ' || '<small>' || pa.columnname);
+         UTL_FILE.PUT_LINE (f, ' ');
+         UTL_FILE.PUT_LINE (f, pa.dbtype);
+         UTL_FILE.PUT_LINE (f, ' ');
 
          IF pa.isrange = 'Y'
          THEN
-            UTL_FILE.put_line (f, v_str_range_title || pa.isrange);
+            UTL_FILE.PUT_LINE (f, v_str_range_title || pa.isrange);
          END IF;
 
-         UTL_FILE.put_line (f, '</small>');
-         UTL_FILE.put_line (f, '|-valign="top"');
+         UTL_FILE.PUT_LINE (f, '</small>');
+         UTL_FILE.PUT_LINE (f, '|-valign="top"');
       END LOOP;                                              --  FOR Pa IN Par
    -- END PARAMETERS
    END LOOP;                                                 --  FOR Pr IN Pro
@@ -283,10 +283,10 @@ BEGIN
    IF v_flag_opentable
    THEN
       -- Table for Fields is Open -> Close Table
-      UTL_FILE.put_line (f, '|}');
+      UTL_FILE.PUT_LINE (f, '|}');
       v_flag_opentable := FALSE;
    END IF;
 
-   UTL_FILE.put_line (f, ' ');
-   UTL_FILE.fclose (f);
+   UTL_FILE.PUT_LINE (f, ' ');
+   UTL_FILE.FCLOSE (f);
 END;
