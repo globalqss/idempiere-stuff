@@ -23,8 +23,8 @@ SELECT      'ALTER TABLE '
          || columnname
          || ') REFERENCES '
          || table_ref
-         || ');' cmd
-    -- || ';' cmd  /* for postgresql */
+         || ');'||CHR(10) cmd
+    -- || ';'||chr(10) cmd  /* for postgresql */
 FROM     (
 -- Table Direct or Search Table Direct
           SELECT t.tablename, c.columnname, r.NAME, c.ad_reference_id,
