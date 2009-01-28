@@ -4,6 +4,7 @@
 
 TAIL="/usr/bin/tail"
 TAILPRM="-30"
+CAT="/usr/bin/tac"
 
 echo Content-type: text/plain
 echo ""
@@ -23,9 +24,9 @@ then
     fi
 fi
 
-if [ -x $TAIL ]
+if [ -x $TAIL -a -x $CAT ]
 then
-        $TAIL $TAILPRM ../data/${FORM_PROJECT}/${FORM_TABLE}.log
+        $TAIL $TAILPRM ../data/${FORM_PROJECT}/${FORM_TABLE}.log | $CAT
 else
-        echo Cannot find command $TAIL on this system.
+        echo Cannot find command $TAIL or $CAT on this system.
 fi

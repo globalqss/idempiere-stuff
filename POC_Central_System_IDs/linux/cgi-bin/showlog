@@ -2,7 +2,7 @@
 
 . ./bashlib
 
-CAT=/bin/cat
+CAT=/usr/bin/tac
 
 echo Content-type: text/plain
 echo ""
