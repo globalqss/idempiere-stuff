@@ -2,7 +2,8 @@
 
 . ./bashlib
 
-CAT=/bin/cat
+TAIL="/usr/bin/tail"
+TAILPRM="-30"
 
 echo Content-type: text/plain
 echo ""
@@ -22,9 +23,9 @@ then
     fi
 fi
 
-if [ -x $CAT ]
+if [ -x $TAIL ]
 then
-        $CAT ../data/${FORM_PROJECT}/${FORM_TABLE}.log
+        $TAIL $TAILPRM ../data/${FORM_PROJECT}/${FORM_TABLE}.log
 else
-        echo Cannot find command $CAT on this system.
+        echo Cannot find command $TAIL on this system.
 fi
