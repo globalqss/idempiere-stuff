@@ -23,37 +23,36 @@ CREATE OR REPLACE FUNCTION drop_client(db_name text, client_id integer)
 RETURNS integer AS 
 $BODY$ 
 DECLARE 
-db_name text := $1; 
-c_id integer := $2; 
-tmp RECORD; 
+    db_name text := $1; 
+    c_id integer := $2; 
+    tmp RECORD; 
 BEGIN 
-RAISE NOTICE 'Setting search_path=%', db_name; 
-EXECUTE 'SET search_path=' 
-|| db_name; 
-RAISE NOTICE 'Deleting %.Client Where AD_Client_ID=%', db_name, c_id; 
-RAISE NOTICE 'Disable triggers and constraints';
-update pg_trigger set tgenabled = 'D' where oid in ( 
-select tr.oid from pg_class cl, pg_trigger tr, pg_namespace ns 
-where tr.tgrelid = cl.oid 
-and  cl.relnamespace = ns.oid 
-and ns.nspname = db_name);  
-RAISE NOTICE 'Removing records belonging to client %', c_id; 
-FOR tmp IN 
-select * from ad_table t where isview = 'N' 
-and ad_table_id in (select ad_table_id from ad_column where columnname = 'AD_Client_ID') 
-order by tablename  
-LOOP 
-raise notice 'Removing items from table - %', tmp.tablename; 
-EXECUTE 'DELETE FROM ' || tmp.tablename || ' WHERE AD_Client_ID = ' || c_id; 
-END LOOP; 
-RAISE NOTICE 'Enable triggers & constraints'; 
-update pg_trigger set tgenabled = 'O' where oid in ( 
-select tr.oid from pg_class cl, pg_trigger tr, pg_namespace ns 
-where tr.tgrelid = cl.oid 
-and  cl.relnamespace = ns.oid 
-and ns.nspname = db_name); 
-RAISE NOTICE 'Done'; 
-RETURN 1; 
+    RAISE NOTICE 'Setting search_path=%', db_name; 
+    EXECUTE 'SET search_path=' || db_name; 
+    RAISE NOTICE 'Deleting %.Client Where AD_Client_ID=%', db_name, c_id; 
+    RAISE NOTICE 'Disable triggers and constraints';
+    update pg_trigger set tgenabled = 'D' where oid in ( 
+        select tr.oid from pg_class cl, pg_trigger tr, pg_namespace ns 
+            where tr.tgrelid = cl.oid 
+                and  cl.relnamespace = ns.oid 
+                and ns.nspname = db_name);  
+    RAISE NOTICE 'Removing records belonging to client %', c_id; 
+    FOR tmp IN 
+        select * from ad_table t where isview = 'N' 
+            and ad_table_id in (select ad_table_id from ad_column where columnname = 'AD_Client_ID') 
+            order by tablename  
+    LOOP 
+        raise notice 'Removing items from table - %', tmp.tablename; 
+        EXECUTE 'DELETE FROM ' || tmp.tablename || ' WHERE AD_Client_ID = ' || c_id; 
+    END LOOP; 
+    RAISE NOTICE 'Enable triggers & constraints'; 
+    update pg_trigger set tgenabled = 'O' where oid in ( 
+        select tr.oid from pg_class cl, pg_trigger tr, pg_namespace ns 
+            where tr.tgrelid = cl.oid 
+                and  cl.relnamespace = ns.oid 
+                and ns.nspname = db_name); 
+    RAISE NOTICE 'Done'; 
+    RETURN 1; 
 END; 
 $BODY$ 
 LANGUAGE 'plpgsql' VOLATILE 
