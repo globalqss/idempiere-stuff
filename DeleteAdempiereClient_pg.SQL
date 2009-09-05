@@ -12,7 +12,7 @@
 * - Usage: 
 * 1. Install drop_client function (Run this script) 
 * 2. Run the following sql: 
-* SELECT <db_name>.drop_client(<db_name>, <client_id>); 
+* SELECT <db_name>.drop_client('<db_name>', <client_id>); 
 * e.g. SELECT drop_client('adempiere', 11); --> Removes GardenWorld 
 * 
 * -Credits: 
@@ -31,11 +31,12 @@ RAISE NOTICE 'Setting search_path=%', db_name;
 EXECUTE 'SET search_path=' 
 || db_name; 
 RAISE NOTICE 'Deleting %.Client Where AD_Client_ID=%', db_name, c_id; 
-RAISE NOTICE 'Disable triggers & constraints'; 
-update pg_trigger set tgenabled = '0' where oid in ( 
-select tr.oid from pg_class cl, pg_trigger tr 
-where cl.relnamespace = 527568 
-and tr.tgrelid = cl.oid); 
+RAISE NOTICE 'Disable triggers and constraints';
+update pg_trigger set tgenabled = 'D' where oid in ( 
+select tr.oid from pg_class cl, pg_trigger tr, pg_namespace ns 
+where tr.tgrelid = cl.oid 
+and  cl.relnamespace = ns.oid 
+and ns.nspname = db_name);  
 RAISE NOTICE 'Removing records belonging to client %', c_id; 
 FOR tmp IN 
 select * from ad_table t where isview = 'N' 
@@ -46,10 +47,11 @@ raise notice 'Removing items from table - %', tmp.tablename;
 EXECUTE 'DELETE FROM ' || tmp.tablename || ' WHERE AD_Client_ID = ' || c_id; 
 END LOOP; 
 RAISE NOTICE 'Enable triggers & constraints'; 
-update pg_trigger set tgenabled = '0' where oid in ( 
-select tr.oid from pg_class cl, pg_trigger tr 
-where cl.relnamespace = 527568 
-and tr.tgrelid = cl.oid);  
+update pg_trigger set tgenabled = 'O' where oid in ( 
+select tr.oid from pg_class cl, pg_trigger tr, pg_namespace ns 
+where tr.tgrelid = cl.oid 
+and  cl.relnamespace = ns.oid 
+and ns.nspname = db_name); 
 RAISE NOTICE 'Done'; 
 RETURN 1; 
 END; 
