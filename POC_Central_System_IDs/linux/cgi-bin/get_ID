@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# ID provider for Adempiere distributed development
-# this is intended to be a replacement of AD_Sequence table for Adempiere development
+# ID provider for iDempiere distributed development
+# this is intended to be a replacement of AD_Sequence table for iDempiere development
 # and/or custom project distributed development
 #
 # Author: Carlos Ruiz (globalqss) 2007/10/13
@@ -22,7 +22,7 @@
 # COMMENT (Comment for the ID)
 
 # Files in ../data
-# Project/Tablename.log (i.e. Adempiere/AD_Column.log) -> Log of ID's assignments
+# Project/Tablename.log (i.e. iDempiere/AD_Column.log) -> Log of ID's assignments
 # Project/Tablename.seq -> current sequence
 # Project/Tablename.lock -> temporary lock
 # Project/RegisteredDevelopers.pwd -> Passwords for registered developers
@@ -59,9 +59,9 @@ do
 done
 > $FILELOCK
 
-if [ "x$FORM_PROJECT" = "xAdempiere" ]
+if [ "x$FORM_PROJECT" = "xiDempiere" ]
 then
-    INITIALID=50000
+    INITIALID=200000
 else
     INITIALID=1000000
 fi
