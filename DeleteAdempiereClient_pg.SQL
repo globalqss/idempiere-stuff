@@ -49,7 +49,7 @@ BEGIN
     FOR r_table IN 
         SELECT tablename, 'AD_Client_ID' AS columnname
             FROM AD_TABLE a
-            WHERE a.isview = 'N'
+            WHERE a.isview = 'N' AND a.isactive = 'Y'
                 AND EXISTS (
                     SELECT ad_column_id
                         FROM AD_COLUMN c

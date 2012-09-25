@@ -40,14 +40,16 @@
  *   - tested on Oracle 10G XE
  ************************************************************************/
 
+set serveroutput on
+
 DECLARE
    /**
     * Please change this one to any client id you want to delete
     **/
-   v_client_id    NUMBER          := 1000002;
+   v_client_id    NUMBER          := 1000000;
    -- novalidate will make the process faster but the constraints won't be validated
-   v_novalidate   VARCHAR2 (10)   := ' ';                  -- slower but sure
-   -- v_novalidate  VARCHAR2(10)    := 'novalidate'; -- faster but unsure
+   -- v_novalidate   VARCHAR2 (10)   := ' ';                  -- slower but sure
+   v_novalidate  VARCHAR2(10)    := 'novalidate'; -- faster but unsure
    v_sql1         VARCHAR2 (1024);
 
    CURSOR cur_contraints_ena
@@ -121,7 +123,7 @@ BEGIN
    LOOP
       v_sql1 := 'alter trigger ' || p.trigger_name || ' disable ';
 
-      -- DBMS_OUTPUT.put_line ('..' || v_sql1);
+      DBMS_OUTPUT.put_line ('..' || v_sql1);
       EXECUTE IMMEDIATE v_sql1;
    END LOOP;                                             -- Disable contraints
 
@@ -134,7 +136,7 @@ BEGIN
          || ' disable constraint '
          || p.constraint_name;
 
-      -- DBMS_OUTPUT.put_line ('..' || v_sql1);
+      DBMS_OUTPUT.put_line ('..' || v_sql1);
       EXECUTE IMMEDIATE v_sql1;
    END LOOP;                                             -- Disable contraints
 
@@ -145,11 +147,12 @@ BEGIN
    LOOP
       v_sql1 := p.v_sql;
 
-      -- DBMS_OUTPUT.put_line ('..' || v_sql1);
+      DBMS_OUTPUT.put_line ('..' || v_sql1);
       EXECUTE IMMEDIATE v_sql1;
       IF SQL%ROWCOUNT > 0 THEN
          DBMS_OUTPUT.put_line('Deleted from '||p.TableName || ': #'||SQL%ROWCOUNT);
       END IF;
+      COMMIT;
    END LOOP;                                                    -- Remove data
    
    FOR p IN cur_role_dep loop
@@ -158,6 +161,7 @@ BEGIN
       IF SQL%ROWCOUNT > 0 THEN
          DBMS_OUTPUT.put_line('Deleted from '||p.TableName||': #'||SQL%ROWCOUNT);
       END IF;
+      COMMIT;
    END LOOP;
    
 
@@ -175,7 +179,7 @@ BEGIN
          || ' constraint '
          || p.constraint_name;
 
-      -- DBMS_OUTPUT.put_line ('..' || v_sql1);
+      DBMS_OUTPUT.put_line ('..' || v_sql1);
       EXECUTE IMMEDIATE v_sql1;
    END LOOP;                                              -- Enable contraints
 
@@ -184,7 +188,7 @@ BEGIN
    LOOP
       v_sql1 := 'alter trigger ' || p.trigger_name || ' enable ';
 
-      -- DBMS_OUTPUT.put_line ('..' || v_sql1);
+      DBMS_OUTPUT.put_line ('..' || v_sql1);
       EXECUTE IMMEDIATE v_sql1;
    END LOOP;                                              -- Enable triggers
    
