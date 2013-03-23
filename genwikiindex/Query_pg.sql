@@ -38,5 +38,5 @@ as t
                  LEFT JOIN AD_WINDOW w ON m.ad_window_id = w.ad_window_id
                  LEFT JOIN AD_WORKFLOW wf ON m.ad_workflow_id = wf.ad_workflow_id
            WHERE m.isactive = 'Y'
-             AND m.ad_menu_id < 1000000
+             -- AND m.ad_menu_id < 1000000
 order by t.path

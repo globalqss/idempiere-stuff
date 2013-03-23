@@ -12,7 +12,7 @@ BEGIN
                       RPAD ('+', (tablevel::integer), '+') || tablename tablename
                  FROM ad_tab b, ad_table t
                 WHERE b.ad_table_id = t.ad_table_id
-                  AND b.ad_window_id = p_ad_window_id
+                  AND b.ad_window_id = p_ad_window_id AND b.isactive='Y'
              ORDER BY seqno LOOP
       v_tables := v_tables || ' ' || r.tablename;
       FOR j IN (SELECT COALESCE (p.classname, p.procedurename) cmd
