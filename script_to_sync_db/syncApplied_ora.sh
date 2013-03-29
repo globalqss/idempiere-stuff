@@ -8,39 +8,33 @@
 
 # Change the following to your needs
 FOLDER=i1.0a-release
-MIGRATIONDIR=/opt/workspace/idempiere/migration/${FOLDER}/oracle
-HOST=myHost
+MIGRATIONDIR=/home/carlos/hgAdempiere/localosgi/migration/${FOLDER}/oracle
+HOST=localhost
 DATABASE=xe
-USER=adempiere
-PASS=myPass
+USER=idempiere
+PASS=mypass
 
 # no need to change things below this line
 cd $MIGRATIONDIR
 
-sqlplus -S $USER/$PASS@$HOST/$DATABASE <<EOF | sort > /tmp/lisDB.txt
-SET head off;
-SET feedback off;
-SET pagesize 50000;
-
-SELECT name FROM ad_migrationscript;
-EXIT
-
-EOF
+echo "set heading off
+set feedback off
+set pagesize 0
+set term off
+set echo off
+select name from ad_migrationscript;" | sqlplus -S $USER/$PASS@$HOST/$DATABASE | sed -e 's:^ ::' | grep -v '^$' | sort > /tmp/lisDB.txt
 ls *.sql | sort > /tmp/lisFS.txt
 
 MSGERROR=""
 APPLIED=N
 for i in `comm -13 /tmp/lisDB.txt /tmp/lisFS.txt`
 do
-    OUTFILE=/tmp/`basename "$i" .sql`.out
-    sqlplus -S $USER/$PASS@$HOST/$DATABASE <<EOF 2>&1 | tee "$OUTFILE"
-SET SQLBLANKLINES ON;
-SET DEFINE OFF;
-`cat "$i" | dos2unix`
-COMMIT;
-EXIT
-EOF
-    if fgrep ERROR "$OUTFILE" > /dev/null 2>&1
+    OUTFILE=/tmp/`basename "$i" .sql`_or.out
+    cat "$i" | sqlplus $USER/$PASS@$HOST/$DATABASE 2>&1 | tee "$OUTFILE"
+    if fgrep "ORA-
+TNS-
+PLS-
+SP2-" "$OUTFILE" > /dev/null 2>&1
     then
         MSGERROR="$MSGERROR
 **** ERROR ON FILE $OUTFILE - Please verify ****"
@@ -51,15 +45,12 @@ if [ x$APPLIED = xY ]
 then
     for i in ../../processes_post_migration/oracle/*.sql
     do
-        OUTFILE=/tmp/`basename "$i" .sql`.out
-        sqlplus -S $USER/$PASS@$HOST/$DATABASE <<EOF 2>&1 | tee "$OUTFILE"
-SET SQLBLANKLINES ON;
-SET DEFINE OFF;
-`cat "$i" | dos2unix`
-COMMIT;
-EXIT
-EOF
-        if fgrep ERROR "$OUTFILE" > /dev/null 2>&1
+        OUTFILE=/tmp/`basename "$i" .sql`_or.out
+	cat "$i" | sqlplus $USER/$PASS@$HOST/$DATABASE 2>&1 | tee "$OUTFILE"
+        if fgrep "ORA-
+TNS-
+PLS-
+SP2-" "$OUTFILE" > /dev/null 2>&1
         then
             MSGERROR="$MSGERROR
 **** ERROR ON FILE $OUTFILE - Please verify ****"
@@ -72,4 +63,3 @@ if [ -n "$MSGERROR" ]
 then
     echo "$MSGERROR"
 fi
-
