@@ -35,6 +35,8 @@ FROM     (
             FROM AD_TABLE t, AD_COLUMN c, AD_REFERENCE r
            WHERE t.ad_table_id = c.ad_table_id
 --           AND t.tablename LIKE 'ASP\_%' ESCAPE '\'
+             AND t.isactive='Y'
+             AND c.isactive='Y'
              AND c.columnsql IS NULL
              AND c.ad_reference_id = r.ad_reference_id
              AND (   c.ad_reference_id IN (19 /*Table Direct*/)
@@ -53,6 +55,8 @@ FROM     (
                  AD_TABLE tr
            WHERE t.ad_table_id = c.ad_table_id
 --           AND t.tablename LIKE 'ASP\_%' ESCAPE '\'
+             AND t.isactive='Y'
+             AND c.isactive='Y'
              AND c.columnsql IS NULL
              AND c.ad_reference_id = r.ad_reference_id
              AND (   c.ad_reference_id IN (18 /*Table*/)
