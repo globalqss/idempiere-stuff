@@ -1,4 +1,4 @@
-FOLDER=i1.0a-release
+FOLDER=i1.0b-release
 MIGRATIONDIR=/home/carlos/hgAdempiere/localosgi/migration/${FOLDER}/postgresql
 DATABASE=idempiere
 USER=adempiere
@@ -39,3 +39,4 @@ if [ -n "$MSGERROR" ]
 then
     echo "$MSGERROR"
 fi
+checkApplied.sh

@@ -7,7 +7,7 @@
 # Contributed by Dirk Niemeyer - a42niem
 
 # Change the following to your needs
-FOLDER=i1.0a-release
+FOLDER=i1.0b-release
 MIGRATIONDIR=/home/carlos/hgAdempiere/localosgi/migration/${FOLDER}/oracle
 HOST=localhost
 DATABASE=xe
