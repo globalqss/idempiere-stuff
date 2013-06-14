@@ -39,4 +39,4 @@ if [ -n "$MSGERROR" ]
 then
     echo "$MSGERROR"
 fi
-checkApplied.sh
+# checkApplied.sh
