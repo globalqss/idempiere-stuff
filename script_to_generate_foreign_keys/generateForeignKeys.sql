@@ -1,17 +1,13 @@
 /*
- # Adempiere contribution
+ # iDempiere contribution
  # Author: Carlos Ruiz - globalqss
  # This script generates the alter table commands to create the foreign keys 
- # based on Adempiere Dictionary definition
- # It runs in oracle database - to generate commands for postgresql comment the lines marked with "for oracle"
- # and comment out the lines marked "for postgresql"
- # 
+ # based on iDempiere Dictionary definition
 */
 
 SELECT      'ALTER TABLE '
          || tablename
-         || ' ADD (CONSTRAINT '  /* for oracle */
-         -- || ' ADD CONSTRAINT '  /* for postgresql */
+         || ' ADD CONSTRAINT '
          || SUBSTR (   REPLACE (SUBSTR (TO_CHAR(columnname), 1, LENGTH (columnname) - 3),
                                 '_',
                                 ''
@@ -25,8 +21,7 @@ SELECT      'ALTER TABLE '
          || columnname
          || ') REFERENCES '
          || table_ref
-         || ');'||CHR(10) cmd  /* for oracle */
-    -- || ' DEFERRABLE INITIALLY DEFERRED;'||chr(10) cmd  /* for postgresql */
+         || ' DEFERRABLE INITIALLY DEFERRED;'||chr(10) cmd
 FROM     (
 -- Table Direct or Search Table Direct
           SELECT t.tablename, c.columnname, r.NAME, c.ad_reference_id,
