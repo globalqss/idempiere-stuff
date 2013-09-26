@@ -1,19 +1,32 @@
-FOLDER=i1.0c-release
-MIGRATIONDIR=~/hgAdempiere/localosgi/migration/${FOLDER}/postgresql
 DATABASE=${1:-idempiere}
 USER=adempiere
 ADDPG=${2}   # i.e. "-h localhost -p 5432"
+
+MIGRATIONDIR=~/hgAdempiere/localosgi/migration
 cd $MIGRATIONDIR
 
 psql -d $DATABASE -U $USER $ADDPG -q -t -c "select name from ad_migrationscript" | sed -e 's:^ ::' | grep -v '^$' | sort > /tmp/lisDB.txt
-ls *.sql | sort > /tmp/lisFS.txt
+
+> /tmp/lisFS.txt
+for FOLDER in i1.0c-release i1.0z
+do
+    if [ -d ${FOLDER}/postgresql ]
+    then
+        cd ${FOLDER}/postgresql
+        ls *.sql | sort >> /tmp/lisFS.txt
+        cd ../..
+    fi
+done
+sort -o /tmp/lisFS.txt /tmp/lisFS.txt
+sort -o /tmp/lisDB.txt /tmp/lisDB.txt
 
 MSGERROR=""
 APPLIED=N
 for i in `comm -13 /tmp/lisDB.txt /tmp/lisFS.txt`
 do
+    SCRIPT=`find . -name "$i" -print | fgrep -v /oracle/`
     OUTFILE=/tmp/`basename "$i" .sql`.out
-    psql -d $DATABASE -U $USER $ADDPG -f "$i" 2>&1 | tee "$OUTFILE"
+    psql -d $DATABASE -U $USER $ADDPG -f "$SCRIPT" 2>&1 | tee "$OUTFILE"
     if fgrep ERROR: "$OUTFILE" > /dev/null 2>&1
     then
         MSGERROR="$MSGERROR
@@ -23,7 +36,7 @@ do
 done
 if [ x$APPLIED = xY ]
 then
-    for i in ../../processes_post_migration/postgresql/*.sql
+    for i in processes_post_migration/postgresql/*.sql
     do
         OUTFILE=/tmp/`basename "$i" .sql`.out
         psql -d $DATABASE -U $USER $ADDPG -f "$i" 2>&1 | tee "$OUTFILE"
