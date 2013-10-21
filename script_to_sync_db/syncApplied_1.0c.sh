@@ -14,6 +14,7 @@ BASEDIR=`dirname $0`
 cd $BASEDIR
 wget -O ${FOLDER}_pg.zip "${JENKINSURL}/ws/migration/${FOLDER}/postgresql/*zip*/postgresql.zip"
 wget -O post_pg.zip      "${JENKINSURL}/ws/migration/processes_post_migration/postgresql/*zip*/postgresql.zip"
+rm -rf ${FOLDER}_pg
 mkdir -p ${FOLDER}_pg
 unzip -u -d ${FOLDER}_pg ${FOLDER}_pg.zip
 mkdir -p post_pg
