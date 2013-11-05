@@ -7,14 +7,14 @@
 # Contributed by Dirk Niemeyer - a42niem
 
 # Change the following to your needs
-FOLDER=i1.0b-release
-MIGRATIONDIR=/home/carlos/hgAdempiere/localosgi/migration/${FOLDER}/oracle
+MIGRATIONDIR=/home/carlos/hgAdempiere/localosgi/migration
 HOST=localhost
 DATABASE=xe
 USER=idempiere
 PASS=mypass
 
-# no need to change things below this line
+MSGERROR=""
+APPLIED=N
 cd $MIGRATIONDIR
 
 echo "set heading off
@@ -23,14 +23,27 @@ set pagesize 0
 set term off
 set echo off
 select name from ad_migrationscript;" | sqlplus -S $USER/$PASS@$HOST/$DATABASE | sed -e 's:^ ::' | grep -v '^$' | sort > /tmp/lisDB.txt
-ls *.sql | sort > /tmp/lisFS.txt
+
+> /tmp/lisFS.txt
+for FOLDER in i2.0 i2.0z
+do
+    if [ -d ${FOLDER}/oracle ]
+    then
+        cd ${FOLDER}/oracle
+        ls *.sql | sort >> /tmp/lisFS.txt
+        cd ../..
+    fi
+done
+sort -o /tmp/lisFS.txt /tmp/lisFS.txt
+sort -o /tmp/lisDB.txt /tmp/lisDB.txt
 
 MSGERROR=""
 APPLIED=N
 for i in `comm -13 /tmp/lisDB.txt /tmp/lisFS.txt`
 do
+    SCRIPT=`find . -name "$i" -print | fgrep -v /postgresql/`
     OUTFILE=/tmp/`basename "$i" .sql`_or.out
-    cat "$i" | sqlplus $USER/$PASS@$HOST/$DATABASE 2>&1 | tee "$OUTFILE"
+    cat "$SCRIPT" | sqlplus $USER/$PASS@$HOST/$DATABASE 2>&1 | tee "$OUTFILE"
     if fgrep "ORA-
 TNS-
 PLS-
@@ -38,15 +51,19 @@ SP2-" "$OUTFILE" > /dev/null 2>&1
     then
         MSGERROR="$MSGERROR
 **** ERROR ON FILE $OUTFILE - Please verify ****"
+    else
+        rm "$OUTFILE"
     fi
     APPLIED=Y
+    sleep 5
 done
 if [ x$APPLIED = xY ]
 then
-    for i in ../../processes_post_migration/oracle/*.sql
+    for i in processes_post_migration/oracle/*.sql
     do
         OUTFILE=/tmp/`basename "$i" .sql`_or.out
 	cat "$i" | sqlplus $USER/$PASS@$HOST/$DATABASE 2>&1 | tee "$OUTFILE"
+        sleep 5
         if fgrep "ORA-
 TNS-
 PLS-
@@ -54,7 +71,10 @@ SP2-" "$OUTFILE" > /dev/null 2>&1
         then
             MSGERROR="$MSGERROR
 **** ERROR ON FILE $OUTFILE - Please verify ****"
+        else
+            rm "$OUTFILE"
         fi
+        sleep 1
     done
 else
     echo "Database is up to date, no scripts to apply"
@@ -62,4 +82,5 @@ fi
 if [ -n "$MSGERROR" ]
 then
     echo "$MSGERROR"
+    exit 1
 fi
