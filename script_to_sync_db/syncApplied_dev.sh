@@ -1,13 +1,13 @@
 #
 # Contributor: Carlos Ruiz - globalqss
 # June 27, 2013
-# Script to synchronize your 1.0c installation with latest migration scripts
+# Script to synchronize your dev-branch installation with latest migration scripts
 # it's a tool to execute in sync with the p2 update
-#   sh update.sh http://ci.idempiere.org/job/iDempiere1.0c/ws/buckminster.output/org.adempiere.server_1.0.0-eclipse.feature/site.p2
+#   sh update.sh http://ci.idempiere.org/job/iDempiere/ws/buckminster.output/org.adempiere.server_1.0.0-eclipse.feature/site.p2
 #
 DATABASE=idempiere
 USER=adempiere
-JENKINSURL=http://ci.idempiere.org/job/iDempiere1.0c
+JENKINSURL=http://ci.idempiere.org/job/iDempiere
 
 BASEDIR=`dirname $0`
 cd $BASEDIR
@@ -15,7 +15,7 @@ wget -O post_pg.zip      "${JENKINSURL}/ws/migration/processes_post_migration/po
 mkdir -p post_pg
 unzip -u -d post_pg post_pg.zip
 > /tmp/lisFS.txt
-for FOLDER in i1.0c i2.0
+for FOLDER in i2.0 i2.0z
 do
     wget -O ${FOLDER}_pg.zip "${JENKINSURL}/ws/migration/${FOLDER}/postgresql/*zip*/postgresql.zip"
     rm -rf ${FOLDER}_pg
