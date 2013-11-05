@@ -1,10 +1,12 @@
 -- 25 - Account - C_ValidCombination
 -- columns expected to end with _Acct
+select * from (
+
 select 'ALTER TABLE '||tablename||
 ' ADD CONSTRAINT '||SUBSTR (REPLACE (SUBSTR (columnname, 1, LENGTH (columnname) - 5), '_', '') || 'vc_' || REPLACE (tablename, '_', ''), 1, 30)||
 ' FOREIGN KEY('||columnname||') REFERENCES C_ValidCombination(C_ValidCombination_ID)'
 ||' DEFERRABLE INITIALLY DEFERRED'||
-';'||chr(10)
+';'||chr(10) as cmd
 from (
 select t.tablename, c.columnname, c.ad_reference_id, c.ad_reference_value_id from ad_table t join ad_column c on (t.ad_table_id=c.ad_table_id) 
 where c.ad_reference_id = 25
@@ -292,5 +294,9 @@ and t.isactive='Y' AND c.isactive='Y' and c.columnsql IS NULL and t.isview = 'N'
 		af.attnum = cof.conkey[1] AND
 		af.attname = LOWER (c.columnname))
 ) as internal
+
+) as cmds
+
+-- where cmd not like '%Asset%' and cmd not like '%A_Funding%'
 
 order by 1
