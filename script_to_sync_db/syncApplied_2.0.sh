@@ -3,7 +3,7 @@
 # June 27, 2013
 # Script to synchronize your 2.0 installation with latest migration scripts
 # it's a tool to execute in sync with the p2 update
-#   sh update.sh http://ci.idempiere.org/job/iDempiere2.0/ws/buckminster.output/org.adempiere.server_1.0.0-eclipse.feature/site.p2
+#   sh update.sh http://ci.idempiere.org/job/iDempiere2.0/ws/buckminster.output/org.adempiere.server_2.0.0-eclipse.feature/site.p2
 #
 DATABASE=idempiere
 USER=adempiere
