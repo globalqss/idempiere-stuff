@@ -2,7 +2,7 @@ DATABASE=${1:-idempiere}
 USER=adempiere
 ADDPG=${2}   # i.e. "-h localhost -p 5432"
 
-MIGRATIONDIR=~/hgAdempiere/localosgi/migration
+MIGRATIONDIR=${3:-~/hgAdempiere/localosgi/migration}
 cd $MIGRATIONDIR
 
 psql -d $DATABASE -U $USER $ADDPG -q -t -c "select name from ad_migrationscript" | sed -e 's:^ ::' | grep -v '^$' | sort > /tmp/lisDB.txt
