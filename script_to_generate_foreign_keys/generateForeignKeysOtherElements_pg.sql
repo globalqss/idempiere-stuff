@@ -297,6 +297,6 @@ and t.isactive='Y' AND c.isactive='Y' and c.columnsql IS NULL and t.isview = 'N'
 
 ) as cmds
 
--- where cmd not like '%Asset%' and cmd not like '%A_Funding%'
+where cmd not like '%Asset%' and cmd not like '%A_Funding%'
 
 order by 1

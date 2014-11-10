@@ -99,5 +99,5 @@ FROM     (
 		cof.contype = 'f' AND
 		af.attnum = cof.conkey[1] AND
 		af.attname = LOWER (v.columnname))
---and tablename not in ('A_Asset_Change','A_Asset_Group_Acct','A_Asset_Split','I_Asset','AD_Package_Exp_Detail')
+and tablename not in ('A_Asset_Change','A_Asset_Group_Acct','A_Asset_Split','I_Asset','AD_Package_Exp_Detail')
 ORDER BY v.tablename, v.table_ref, v.columnname
