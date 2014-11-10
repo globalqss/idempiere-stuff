@@ -1,7 +1,9 @@
 #
 # Contributor: Carlos Ruiz - globalqss
 # June 27, 2013
-# Script to migrate from a 1.0c database to 2.0 - this one applies scripts on 1.0z folder
+# Script to synchronize your 2.1 installation with latest migration scripts
+# it's a tool to execute in sync with the p2 update
+#   sh update.sh http://ci.idempiere.org/job/iDempiere2.1/ws/buckminster.output/org.adempiere.server_2.1.0-eclipse.feature/site.p2
 #
 DATABASE=idempiere
 USER=adempiere
@@ -13,7 +15,7 @@ wget -O post_pg.zip      "${JENKINSURL}/ws/migration/processes_post_migration/po
 mkdir -p post_pg
 unzip -u -d post_pg post_pg.zip
 > /tmp/lisFS.txt
-for FOLDER in i1.0z
+for FOLDER in i2.1
 do
     wget -O ${FOLDER}_pg.zip "${JENKINSURL}/ws/migration/${FOLDER}/postgresql/*zip*/postgresql.zip"
     rm -rf ${FOLDER}_pg

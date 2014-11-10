@@ -1,7 +1,7 @@
 #
 # Contributor: Carlos Ruiz - globalqss
 # June 27, 2013
-# Script to migrate from a 1.0c database to 2.0 - this one applies scripts on 1.0z folder
+# Script to migrate from a 2.0 database to 2.1 - this one applies scripts on 2.0z folder
 #
 DATABASE=idempiere
 USER=adempiere
@@ -13,7 +13,7 @@ wget -O post_pg.zip      "${JENKINSURL}/ws/migration/processes_post_migration/po
 mkdir -p post_pg
 unzip -u -d post_pg post_pg.zip
 > /tmp/lisFS.txt
-for FOLDER in i1.0z
+for FOLDER in i2.0z
 do
     wget -O ${FOLDER}_pg.zip "${JENKINSURL}/ws/migration/${FOLDER}/postgresql/*zip*/postgresql.zip"
     rm -rf ${FOLDER}_pg

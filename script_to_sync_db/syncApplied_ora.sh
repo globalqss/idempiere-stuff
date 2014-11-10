@@ -25,7 +25,7 @@ set echo off
 select name from ad_migrationscript;" | sqlplus -S $USER/$PASS@$HOST/$DATABASE | sed -e 's:^ ::' | grep -v '^$' | sort > /tmp/lisDB.txt
 
 > /tmp/lisFS.txt
-for FOLDER in i2.0 i2.0z
+for FOLDER in i2.1 i2.1z
 do
     if [ -d ${FOLDER}/oracle ]
     then
