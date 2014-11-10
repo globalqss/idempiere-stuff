@@ -3,7 +3,7 @@
 # June 27, 2013
 # Script to synchronize your dev-branch installation with latest migration scripts
 # it's a tool to execute in sync with the p2 update
-#   sh update.sh http://ci.idempiere.org/job/iDempiere/ws/buckminster.output/org.adempiere.server_2.0.0-eclipse.feature/site.p2
+#   sh update.sh http://ci.idempiere.org/job/iDempiere/ws/buckminster.output/org.adempiere.server_2.1.0-eclipse.feature/site.p2
 #
 DATABASE=idempiere
 USER=adempiere
@@ -15,7 +15,7 @@ wget -O post_pg.zip      "${JENKINSURL}/ws/migration/processes_post_migration/po
 mkdir -p post_pg
 unzip -u -d post_pg post_pg.zip
 > /tmp/lisFS.txt
-for FOLDER in i2.0 i2.0z
+for FOLDER in i2.1 i2.1z
 do
     wget -O ${FOLDER}_pg.zip "${JENKINSURL}/ws/migration/${FOLDER}/postgresql/*zip*/postgresql.zip"
     rm -rf ${FOLDER}_pg
@@ -39,7 +39,8 @@ do
     SCRIPT=`find . -name "$i" -print`
     OUTFILE=/tmp/`basename "$i" .sql`.out
     psql -d $DATABASE -U $USER -f "$SCRIPT" 2>&1 | tee "$OUTFILE"
-    if fgrep ERROR: "$OUTFILE" > /dev/null 2>&1
+    if fgrep "ERROR:
+FATAL:" "$OUTFILE" > /dev/null 2>&1
     then
         MSGERROR="$MSGERROR\n**** ERROR ON FILE $OUTFILE - Please verify ****"
     fi
@@ -51,7 +52,8 @@ then
     do
         OUTFILE=/tmp/`basename "$i" .sql`.out
         psql -d $DATABASE -U $USER -f "$i" 2>&1 | tee "$OUTFILE"
-        if fgrep ERROR: "$OUTFILE" > /dev/null 2>&1
+        if fgrep "ERROR:
+FATAL:" "$OUTFILE" > /dev/null 2>&1
         then
             MSGERROR="$MSGERROR\n**** ERROR ON FILE $OUTFILE - Please verify ****"
         fi

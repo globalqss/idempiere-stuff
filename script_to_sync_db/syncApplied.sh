@@ -8,7 +8,7 @@ cd $MIGRATIONDIR
 psql -d $DATABASE -U $USER $ADDPG -q -t -c "select name from ad_migrationscript" | sed -e 's:^ ::' | grep -v '^$' | sort > /tmp/lisDB.txt
 
 > /tmp/lisFS.txt
-for FOLDER in i2.0 i2.0z
+for FOLDER in i2.1 i2.1z
 do
     if [ -d ${FOLDER}/postgresql ]
     then
@@ -27,7 +27,8 @@ do
     SCRIPT=`find . -name "$i" -print | fgrep -v /oracle/`
     OUTFILE=/tmp/`basename "$i" .sql`.out
     psql -d $DATABASE -U $USER $ADDPG -f "$SCRIPT" 2>&1 | tee "$OUTFILE"
-    if fgrep ERROR: "$OUTFILE" > /dev/null 2>&1
+    if fgrep "ERROR:
+FATAL:" "$OUTFILE" > /dev/null 2>&1
     then
         MSGERROR="$MSGERROR
 **** ERROR ON FILE $OUTFILE - Please verify ****"
@@ -40,7 +41,8 @@ then
     do
         OUTFILE=/tmp/`basename "$i" .sql`.out
         psql -d $DATABASE -U $USER $ADDPG -f "$i" 2>&1 | tee "$OUTFILE"
-        if fgrep ERROR: "$OUTFILE" > /dev/null 2>&1
+        if fgrep "ERROR:
+FATAL:" "$OUTFILE" > /dev/null 2>&1
         then
             MSGERROR="$MSGERROR
 **** ERROR ON FILE $OUTFILE - Please verify ****"

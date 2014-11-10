@@ -7,7 +7,7 @@
 #
 DATABASE=idempiere
 USER=adempiere
-JENKINSURL=http://ci.idempiere.org/job/iDempiere2.0
+JENKINSURL=http://ci.idempiere.org/job/iDempiere2.1
 
 BASEDIR=`dirname $0`
 cd $BASEDIR
@@ -39,7 +39,8 @@ do
     SCRIPT=`find . -name "$i" -print`
     OUTFILE=/tmp/`basename "$i" .sql`.out
     psql -d $DATABASE -U $USER -f "$SCRIPT" 2>&1 | tee "$OUTFILE"
-    if fgrep ERROR: "$OUTFILE" > /dev/null 2>&1
+    if fgrep "ERROR:
+FATAL:" "$OUTFILE" > /dev/null 2>&1
     then
         MSGERROR="$MSGERROR\n**** ERROR ON FILE $OUTFILE - Please verify ****"
     fi
@@ -51,7 +52,8 @@ then
     do
         OUTFILE=/tmp/`basename "$i" .sql`.out
         psql -d $DATABASE -U $USER -f "$i" 2>&1 | tee "$OUTFILE"
-        if fgrep ERROR: "$OUTFILE" > /dev/null 2>&1
+        if fgrep "ERROR:
+FATAL:" "$OUTFILE" > /dev/null 2>&1
         then
             MSGERROR="$MSGERROR\n**** ERROR ON FILE $OUTFILE - Please verify ****"
         fi
