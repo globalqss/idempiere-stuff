@@ -45,13 +45,14 @@ as n
                  LEFT JOIN AD_WINDOW     w ON m.ad_window_id = w.ad_window_id AND w.isactive='Y'
                  LEFT JOIN AD_WORKFLOW   f ON m.ad_workflow_id = f.ad_workflow_id AND f.isactive='Y'
                  LEFT JOIN AD_INFOWINDOW i ON m.ad_infowindow_id = i.ad_infowindow_id AND i.isactive='Y'
-                 -- uncomment next 6 lines and replace roleID for specific role menu
-                 LEFT JOIN AD_Process_Access    pa ON pa.AD_Role_ID=102 AND pa.IsActive='Y' AND pa.AD_Process_ID=p.AD_Process_ID
-                 LEFT JOIN AD_Form_Access       xa ON xa.AD_Role_ID=102 AND xa.IsActive='Y' AND xa.AD_Form_ID=x.AD_Form_ID
-                 LEFT JOIN AD_Task_Access       ta ON ta.AD_Role_ID=102 AND ta.IsActive='Y' AND ta.AD_Task_ID=t.AD_Task_ID
-                 LEFT JOIN AD_Window_Access     wa ON wa.AD_Role_ID=102 AND wa.IsActive='Y' AND wa.AD_Window_ID=w.AD_Window_ID
-                 LEFT JOIN AD_Workflow_Access   fa ON fa.AD_Role_ID=102 AND fa.IsActive='Y' AND fa.AD_Workflow_ID=f.AD_Workflow_ID
-                 LEFT JOIN AD_InfoWindow_Access ia ON ia.AD_Role_ID=102 AND ia.IsActive='Y' AND ia.AD_InfoWindow_ID=i.AD_InfoWindow_ID
+                 -- uncomment next 7 lines and replace roleID for specific role menu
+                 LEFT JOIN AD_Role r ON AD_Role_ID=102
+                 LEFT JOIN AD_Process_Access    pa ON pa.AD_Role_ID=r.AD_Role_ID AND pa.IsActive='Y' AND pa.AD_Process_ID=p.AD_Process_ID
+                 LEFT JOIN AD_Form_Access       xa ON xa.AD_Role_ID=r.AD_Role_ID AND xa.IsActive='Y' AND xa.AD_Form_ID=x.AD_Form_ID
+                 LEFT JOIN AD_Task_Access       ta ON ta.AD_Role_ID=r.AD_Role_ID AND ta.IsActive='Y' AND ta.AD_Task_ID=t.AD_Task_ID
+                 LEFT JOIN AD_Window_Access     wa ON wa.AD_Role_ID=r.AD_Role_ID AND wa.IsActive='Y' AND wa.AD_Window_ID=w.AD_Window_ID
+                 LEFT JOIN AD_Workflow_Access   fa ON fa.AD_Role_ID=r.AD_Role_ID AND fa.IsActive='Y' AND fa.AD_Workflow_ID=f.AD_Workflow_ID
+                 LEFT JOIN AD_InfoWindow_Access ia ON ia.AD_Role_ID=r.AD_Role_ID AND ia.IsActive='Y' AND ia.AD_InfoWindow_ID=i.AD_InfoWindow_ID
            WHERE m.isactive = 'Y'
              -- uncomment next for just official entries
              -- and m.ad_menu_id < 1000000
