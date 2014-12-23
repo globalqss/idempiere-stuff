@@ -8,7 +8,7 @@ SELECT     n.node_id, n.parent_id, n.depth, n.seqno,
                          WHEN 'F' THEN 'Workflow'
                          WHEN 'P' THEN 'Process'
                          WHEN 'R' THEN 'Report'
-                         WHEN 'n' THEN 'Task'
+                         WHEN 'T' THEN 'Task'
                          WHEN 'W' THEN 'Window'
                          WHEN 'X' THEN 'Form'
                          WHEN 'I' THEN 'Info'
