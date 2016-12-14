@@ -7,6 +7,10 @@
 # Contributed by Dirk Niemeyer - a42niem
 
 # Change the following to your needs
+
+# for oracle client portable
+#export LD_LIBRARY_PATH=/mnt/data/programe/oracleDbClient/instantclient_12_1
+#export PATH=$PATH:/mnt/data/programe/oracleDbClient/instantclient_12_1
 MIGRATIONDIR=/home/carlos/hgAdempiere/localosgi/migration
 HOST=localhost
 DATABASE=xe
@@ -44,10 +48,7 @@ do
     SCRIPT=`find . -name "$i" -print | fgrep -v /postgresql/`
     OUTFILE=/tmp/`basename "$i" .sql`_or.out
     cat "$SCRIPT" | sqlplus $USER/$PASS@$HOST/$DATABASE 2>&1 | tee "$OUTFILE"
-    if fgrep "ORA-
-TNS-
-PLS-
-SP2-" "$OUTFILE" > /dev/null 2>&1
+    if egrep "^(ORA-[0-9]+:|TNS-|PLS-)" "$OUTFILE" > /dev/null 2>&1
     then
         MSGERROR="$MSGERROR
 **** ERROR ON FILE $OUTFILE - Please verify ****"
@@ -64,10 +65,7 @@ then
         OUTFILE=/tmp/`basename "$i" .sql`_or.out
 	cat "$i" | sqlplus $USER/$PASS@$HOST/$DATABASE 2>&1 | tee "$OUTFILE"
         sleep 5
-        if fgrep "ORA-
-TNS-
-PLS-
-SP2-" "$OUTFILE" > /dev/null 2>&1
+        if egrep "^(ORA-[0-9]+:|TNS-|PLS-)" "$OUTFILE" > /dev/null 2>&1
         then
             MSGERROR="$MSGERROR
 **** ERROR ON FILE $OUTFILE - Please verify ****"
