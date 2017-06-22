@@ -11,13 +11,13 @@ JENKINSURL=http://ci.idempiere.org/job/iDempiere4.1
 
 BASEDIR=`dirname $0`
 cd $BASEDIR
-wget -O post_pg.zip      "${JENKINSURL}/ws/migration/processes_post_migration/postgresql/*zip*/postgresql.zip"
+wget --timeout=15 --tries=2  -O post_pg.zip      "${JENKINSURL}/ws/migration/processes_post_migration/postgresql/*zip*/postgresql.zip"
 mkdir -p post_pg
 unzip -u -d post_pg post_pg.zip
 > /tmp/lisFS.txt
 for FOLDER in i3.1 i3.1z
 do
-    wget -O ${FOLDER}_pg.zip "${JENKINSURL}/ws/migration/${FOLDER}/postgresql/*zip*/postgresql.zip"
+    wget --timeout=15 --tries=2  -O ${FOLDER}_pg.zip "${JENKINSURL}/ws/migration/${FOLDER}/postgresql/*zip*/postgresql.zip"
     rm -rf ${FOLDER}_pg
     mkdir -p ${FOLDER}_pg
     unzip -u -d ${FOLDER}_pg ${FOLDER}_pg.zip
