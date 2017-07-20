@@ -95,7 +95,7 @@ do
 	then
             $DEBUG "CONSECUTIVE = ALLOWED_CONSECUTIVE_RESTARTS ... stopping process"
             (
-	        echo "Subject: $SYSTEMNAME self-monitor max consecutive restarts reached `hostname` - manual action required `date +'%Y-%m-%d %H:%M:%S'`"
+		echo "Subject: $SYSTEMNAME `hostname` self-monitor MAX consecutive restarts reached - manual action required `date +'%Y-%m-%d %H:%M:%S'`"
 		if [ -n "$EMAIL_NOTIFY" ]
 		then
 	            echo "To:  $EMAIL_NOTIFY"
@@ -115,7 +115,7 @@ do
 	then
             $DEBUG "RETRIES = GRACE_RETRIES ... restarting `date +'%Y-%m-%d %H:%M:%S'`"
             (
-	        echo "Subject: $SYSTEMNAME self-monitor detected failure `hostname` - restarting `date +'%Y-%m-%d %H:%M:%S'`"
+		echo "Subject: $SYSTEMNAME `hostname` self-monitor detected failure - restarting `date +'%Y-%m-%d %H:%M:%S'`"
 		if [ -n "$EMAIL_NOTIFY" ]
 		then
 	            echo "To:  $EMAIL_NOTIFY"
