@@ -1,7 +1,7 @@
 -- 25 - Account - C_ValidCombination
 -- columns expected to end with _Acct
 select * from (
-
+--
 select 'ALTER TABLE '||tablename||
 ' ADD CONSTRAINT '||SUBSTR (REPLACE (SUBSTR (columnname, 1, LENGTH (columnname) - 5), '_', '') || 'vc_' || REPLACE (tablename, '_', ''), 1, 30)||
 ' FOREIGN KEY('||columnname||') REFERENCES C_ValidCombination(C_ValidCombination_ID)'
@@ -40,9 +40,9 @@ and t.isactive='Y' AND c.isactive='Y' and c.columnsql IS NULL and t.isview = 'N'
 		af.attnum = cof.conkey[1] AND
 		af.attname = LOWER (c.columnname))
 ) as internal
-
+--
 union
-
+--
 -- 33 - Assignment - S_ResourceAssignment
 -- columns expected to end with _ID - all below
 select 'ALTER TABLE '||tablename||
@@ -83,9 +83,9 @@ and t.isactive='Y' AND c.isactive='Y' and c.columnsql IS NULL and t.isview = 'N'
 		af.attnum = cof.conkey[1] AND
 		af.attname = LOWER (c.columnname))
 ) as internal
-
+--
 union
-
+--
 -- 32 - Image - AD_Image
 select 'ALTER TABLE '||tablename||
 ' ADD CONSTRAINT '||SUBSTR (REPLACE (SUBSTR (columnname, 1, LENGTH (columnname) - 3), '_', '') || '_' || REPLACE (tablename, '_', ''), 1, 30)||
@@ -126,9 +126,9 @@ and columnname != 'BinaryData'
 		af.attnum = cof.conkey[1] AND
 		af.attname = LOWER (c.columnname))
 ) as internal
-
+--
 union
-
+--
 -- 21 - Location - C_Location_ID
 select 'ALTER TABLE '||tablename||
 ' ADD CONSTRAINT '||SUBSTR (REPLACE (SUBSTR (columnname, 1, LENGTH (columnname) - 3), '_', '') || '_' || REPLACE (tablename, '_', ''), 1, 30)||
@@ -168,9 +168,9 @@ and t.isactive='Y' AND c.isactive='Y' and c.columnsql IS NULL and t.isview = 'N'
 		af.attnum = cof.conkey[1] AND
 		af.attname = LOWER (c.columnname))
 ) as internal
-
+--
 union
-
+--
 -- 31 - Locator - M_Locator_ID
 select 'ALTER TABLE '||tablename||
 ' ADD CONSTRAINT '||SUBSTR (REPLACE (SUBSTR (columnname, 1, LENGTH (columnname) - 3), '_', '') || '_' || REPLACE (tablename, '_', ''), 1, 30)||
@@ -210,9 +210,9 @@ and t.isactive='Y' AND c.isactive='Y' and c.columnsql IS NULL and t.isview = 'N'
 		af.attnum = cof.conkey[1] AND
 		af.attname = LOWER (c.columnname))
 ) as internal
-
+--
 union
-
+--
 -- 35 - Product Attribute - M_AttributeSetInstance_ID
 select 'ALTER TABLE '||tablename||
 ' ADD CONSTRAINT '||SUBSTR (REPLACE (SUBSTR (columnname, 1, LENGTH (columnname) - 3), '_', '') || '_' || REPLACE (tablename, '_', ''), 1, 30)||
@@ -252,9 +252,9 @@ and t.isactive='Y' AND c.isactive='Y' and c.columnsql IS NULL and t.isview = 'N'
 		af.attnum = cof.conkey[1] AND
 		af.attname = LOWER (c.columnname))
 ) as internal
-
+--
 union
-
+--
 -- 53370 - Chart - AD_Chart
 select 'ALTER TABLE '||tablename||
 ' ADD CONSTRAINT '||SUBSTR (REPLACE (SUBSTR (columnname, 1, LENGTH (columnname) - 3), '_', '') || '_' || REPLACE (tablename, '_', ''), 1, 30)||
@@ -294,9 +294,9 @@ and t.isactive='Y' AND c.isactive='Y' and c.columnsql IS NULL and t.isview = 'N'
 		af.attnum = cof.conkey[1] AND
 		af.attname = LOWER (c.columnname))
 ) as internal
-
+--
 ) as cmds
-
+--
 where cmd not like '%Asset%' and cmd not like '%A_Funding%'
-
+--
 order by 1
