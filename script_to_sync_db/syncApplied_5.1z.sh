@@ -1,26 +1,26 @@
 #
 # Contributor: Carlos Ruiz - globalqss
 # June 27, 2013
-# Script to synchronize your 2.1 installation with latest migration scripts
+# Script to synchronize your 5.1z installation with latest migration scripts
 # it's a tool to execute in sync with the p2 update
-#   sh update.sh http://ci.idempiere.org/job/iDempiere2.1/ws/buckminster.output/org.adempiere.server_2.1.0-eclipse.feature/site.p2
+#   sh update.sh http://ci.idempiere.org/job/iDempiere/ws/buckminster.output/org.adempiere.server_5.1.0-eclipse.feature/site.p2
 #
 DATABASE=idempiere
 USER=adempiere
-JENKINSURL=http://ci.idempiere.org/job/iDempiere2.1
+JENKINSURL=http://ci.idempiere.org/job/iDempiere
 
 BASEDIR=`dirname $0`
 cd $BASEDIR
-wget --timeout=15 --tries=2  -O post_pg.zip      "${JENKINSURL}/ws/migration/processes_post_migration/postgresql/*zip*/postgresql.zip"
+wget --timeout=15 --tries=2  --no-verbose -O post_pg.zip      "${JENKINSURL}/ws/migration/processes_post_migration/postgresql/*zip*/postgresql.zip"
 mkdir -p post_pg
-unzip -u -d post_pg post_pg.zip
+unzip -q -u -d post_pg post_pg.zip
 > /tmp/lisFS.txt
-for FOLDER in i2.1
+for FOLDER in i2.0 i2.0z i2.1 i2.1z i3.1 i3.1z i4.1 i4.1z i5.1 i5.1z
 do
-    wget --timeout=15 --tries=2  -O ${FOLDER}_pg.zip "${JENKINSURL}/ws/migration/${FOLDER}/postgresql/*zip*/postgresql.zip"
+    wget --timeout=15 --tries=2  --no-verbose -O ${FOLDER}_pg.zip "${JENKINSURL}/ws/migration/${FOLDER}/postgresql/*zip*/postgresql.zip"
     rm -rf ${FOLDER}_pg
     mkdir -p ${FOLDER}_pg
-    unzip -u -d ${FOLDER}_pg ${FOLDER}_pg.zip
+    unzip -q -u -d ${FOLDER}_pg ${FOLDER}_pg.zip
 
     psql -d $DATABASE -U $USER -q -t -c "select name from ad_migrationscript" | sed -e 's:^ ::' | grep -v '^$' | sort > /tmp/lisDB.txt
     if [ -d ${FOLDER}_pg/postgresql ]
@@ -38,8 +38,10 @@ for i in `comm -13 /tmp/lisDB.txt /tmp/lisFS.txt`
 do
     SCRIPT=`find . -name "$i" -print`
     OUTFILE=/tmp/`basename "$i" .sql`.out
+    echo "Applying $SCRIPT"
     psql -d $DATABASE -U $USER -f "$SCRIPT" 2>&1 | tee "$OUTFILE"
     if fgrep "ERROR:
+FEHLER:
 FATAL:" "$OUTFILE" > /dev/null 2>&1
     then
         MSGERROR="$MSGERROR\n**** ERROR ON FILE $OUTFILE - Please verify ****"
@@ -53,6 +55,7 @@ then
         OUTFILE=/tmp/`basename "$i" .sql`.out
         psql -d $DATABASE -U $USER -f "$i" 2>&1 | tee "$OUTFILE"
         if fgrep "ERROR:
+FEHLER:
 FATAL:" "$OUTFILE" > /dev/null 2>&1
         then
             MSGERROR="$MSGERROR\n**** ERROR ON FILE $OUTFILE - Please verify ****"
