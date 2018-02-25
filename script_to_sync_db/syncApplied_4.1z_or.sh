@@ -15,14 +15,14 @@ BASEDIR=`dirname $0`
 cd $BASEDIR
 wget --timeout=15 --tries=2  --no-verbose -O post_or.zip      "${JENKINSURL}/ws/migration/processes_post_migration/oracle/*zip*/oracle.zip"
 mkdir -p post_or
-unzip -q -u -d post_or post_or.zip
+unzip -o -q -u -d post_or post_or.zip
 > /tmp/lisFS.txt
 for FOLDER in i4.1 i4.1z
 do
     wget --timeout=15 --tries=2  --no-verbose -O ${FOLDER}_or.zip "${JENKINSURL}/ws/migration/${FOLDER}/oracle/*zip*/oracle.zip"
     rm -rf ${FOLDER}_or
     mkdir -p ${FOLDER}_or
-    unzip -q -u -d ${FOLDER}_or ${FOLDER}_or.zip
+    unzip -o -q -u -d ${FOLDER}_or ${FOLDER}_or.zip
 
     echo "set heading off
 set feedback off
