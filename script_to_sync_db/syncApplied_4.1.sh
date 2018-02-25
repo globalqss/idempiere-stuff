@@ -13,14 +13,14 @@ BASEDIR=`dirname $0`
 cd $BASEDIR
 wget --timeout=15 --tries=2  --no-verbose -O post_pg.zip      "${JENKINSURL}/ws/migration/processes_post_migration/postgresql/*zip*/postgresql.zip"
 mkdir -p post_pg
-unzip -q -u -d post_pg post_pg.zip
+unzip -o -q -u -d post_pg post_pg.zip
 > /tmp/lisFS.txt
 for FOLDER in i4.1
 do
     wget --timeout=15 --tries=2  --no-verbose -O ${FOLDER}_pg.zip "${JENKINSURL}/ws/migration/${FOLDER}/postgresql/*zip*/postgresql.zip"
     rm -rf ${FOLDER}_pg
     mkdir -p ${FOLDER}_pg
-    unzip -q -u -d ${FOLDER}_pg ${FOLDER}_pg.zip
+    unzip -o -q -u -d ${FOLDER}_pg ${FOLDER}_pg.zip
 
     psql -d $DATABASE -U $USER -q -t -c "select name from ad_migrationscript" | sed -e 's:^ ::' | grep -v '^$' | sort > /tmp/lisDB.txt
     if [ -d ${FOLDER}_pg/postgresql ]
