@@ -14,16 +14,19 @@ cut_increment_by_half() {
     fi
 }
 
-if [ $# -ne 1 ]
+if [ $# -gt 1 ]
 then
-    echo "Usage: $0 repository_url"
+    echo "Usage: $0 [repository_url]"
     echo "Example:"
     echo "   $0 https://bitbucket.org/idempiere/idempiere"
     exit 1
 fi
-echo "Cloning rev 1 from $1 ... "
-hg -q clone -r 1 $1
-cd `basename $1`
+if [ $# -eq 1 ]
+then
+    echo "Cloning rev 1 from $1 ... "
+    hg -q clone -r 1 $1
+    cd `basename $1`
+fi
 INCREMENT=100
 PREVREV=0
 while true
@@ -31,9 +34,10 @@ do
     ACTUALREV=`hg identify -n`
     REV=$(( $ACTUALREV + $INCREMENT ))
     echo -n "Pulling $REV ... "
-    ERROR=`hg -q pull -r $REV -u 2>&1`
+    ERROR=`hg -v pull -r $REV -u 2>&1`
     result=$?
     echo "result=$result"
+    echo $ERROR
     if [ $result -eq 255 ]
     then
         MATCH=`expr "$ERROR" : ".*unknown revision*"`
@@ -55,7 +59,7 @@ do
     if [ $PREVREV -eq $REV ]
     then
 	cut_increment_by_half
-	echo "error: not advancing ... changin increment to $INCREMENT"
+	echo "error: not advancing ... changing increment to $INCREMENT"
     fi
     PREVREV=$REV
 done
