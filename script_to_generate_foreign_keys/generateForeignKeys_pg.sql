@@ -26,7 +26,11 @@ FROM     (
 -- Table Direct or Search Table Direct
           SELECT t.tablename, c.columnname, r.NAME, c.ad_reference_id,
                  c.ad_reference_value_id,
-                 CAST (SUBSTR (columnname, 1, LENGTH (columnname) - 3) AS VARCHAR(40)) AS table_ref
+                 CASE WHEN columnname='AD_AllClients_V_ID' THEN 'AD_Client'
+                      WHEN columnname='AD_AllUsers_V_ID' THEN 'AD_User'
+                      WHEN columnname='AD_AllRoles_V_ID' THEN 'AD_Role'
+                      ELSE CAST (SUBSTR (columnname, 1, LENGTH (columnname) - 3) AS VARCHAR(40))
+                 END AS table_ref
             FROM AD_TABLE t, AD_COLUMN c, AD_REFERENCE r
            WHERE t.ad_table_id = c.ad_table_id
              -- AND t.tablename LIKE 'ASP|_%' ESCAPE '|'
@@ -42,12 +46,17 @@ FROM     (
           UNION
 -- Table or Search
           SELECT t.tablename, c.columnname, r.NAME, c.ad_reference_id,
-                 c.ad_reference_value_id, tr.tablename
-            FROM AD_TABLE t,
-                 AD_COLUMN c,
-                 AD_REFERENCE r,
-                 AD_REF_TABLE rt,
-                 AD_TABLE tr
+                 c.ad_reference_value_id,
+                 CASE WHEN tr.tablename='AD_AllClients_V' THEN 'AD_Client'
+                      WHEN tr.tablename='AD_AllUsers_V' THEN 'AD_User'
+                      WHEN tr.tablename='AD_AllRoles_V' THEN 'AD_Role'
+                      ELSE tr.tablename
+                 END AS tablename
+            FROM ad_table t,
+                 ad_column c,
+                 ad_reference r,
+                 ad_ref_table rt,
+                 ad_table tr
            WHERE t.ad_table_id = c.ad_table_id
              -- AND t.tablename LIKE 'ASP|_%' ESCAPE '|'
              AND t.isactive='Y'
@@ -99,5 +108,5 @@ FROM     (
 		cof.contype = 'f' AND
 		af.attnum = cof.conkey[1] AND
 		af.attname = LOWER (v.columnname))
-and tablename not in ('A_Asset_Change','A_Asset_Group_Acct','A_Asset_Split','I_Asset','AD_Package_Exp_Detail')
-ORDER BY v.tablename, v.table_ref, v.columnname
+and tablename not in ('A_Asset_Change','A_Asset_Group_Acct','A_Asset_Split','I_Asset')
+ORDER BY v.tablename, v.table_ref, v.columnname;
