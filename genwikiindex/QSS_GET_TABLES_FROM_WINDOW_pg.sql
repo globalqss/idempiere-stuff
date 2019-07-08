@@ -20,7 +20,13 @@ BEGIN
                  WHERE f.ad_tab_id = r.ad_tab_id
                    AND f.ad_column_id = c.ad_column_id
                    AND c.ad_reference_id = 28
-                   AND c.ad_process_id = p.ad_process_id)
+                   AND c.ad_process_id = p.ad_process_id
+                UNION
+                SELECT COALESCE (p.classname, p.procedurename) cmd
+                  FROM ad_toolbarbutton f, ad_process p
+                 WHERE f.ad_tab_id = r.ad_tab_id
+                   AND f.ad_process_id = p.ad_process_id
+                ORDER BY 1)
       LOOP
          IF j.cmd IS NOT NULL
          THEN
