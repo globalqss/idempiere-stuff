@@ -1,29 +1,29 @@
-psql -d idempiere51 -U adempiere -f QSS_GET_TABLES_FROM_WINDOW_pg.sql > /dev/null
+psql -d idempiere62 -U adempiere -f QSS_GET_TABLES_FROM_WINDOW_pg.sql > /dev/null
 
 opentable="N"
 
 ( echo "copy (" ; cat Query_pg.sql; echo ") to stdout with csv;" ) |
-psql -d idempiere51 -U adempiere -q -t -A -F"," | sed -e 's/"//g' |
+psql -d idempiere62 -U adempiere -q -t -A -F"," | sed -e 's/"//g' |
 while IFS=, read node_id parent_id level seqno issummary name type action technical id beta rest
 do
     name=`echo $name | tr '|' ','`
     sec=""
-    if [ $level -lt 4 ]
+    if [ "$level" -lt 4 ]
     then
-        if [ $issummary = "Y" ]
+        if [ "$issummary" = "Y" ]
 	then
 	    sec=`head -c $level < /dev/zero | tr '\0' '='`
 	fi
     fi
-    if [ $issummary = "Y" ]
+    if [ "$issummary" = "Y" ]
     then
-	if [ $opentable = "Y" ]
+	if [ "$opentable" = "Y" ]
 	then
             # Table is Open -> Close Table
 	    echo "|}"
 	    opentable="N"
 	fi
-	if [ $level -eq 1 ]
+	if [ "$level" -eq 1 ]
 	then
             # Insert Empty Line
 	    echo
@@ -34,7 +34,7 @@ do
 	echo
     else
         # Table Format
-	if [ $opentable = "N" ]
+	if [ "$opentable" = "N" ]
 	then
             # Flag activated to indicate Table is Open
 	    echo "{|"

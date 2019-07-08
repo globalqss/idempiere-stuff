@@ -19,7 +19,7 @@ SELECT     n.node_id, n.parent_id, n.depth, n.seqno,
                      COALESCE (p.classname,
                           COALESCE (p.procedurename,
                                COALESCE (t.os_command,
-                                    COALESCE (i.fromclause,
+                                    COALESCE (REPLACE(i.fromclause,chr(10),' '),
                                          qss_get_tables_from_window (m.ad_window_id)
                                         )
                                    )
