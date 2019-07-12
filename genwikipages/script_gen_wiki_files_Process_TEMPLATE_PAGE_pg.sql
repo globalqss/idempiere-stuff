@@ -11,7 +11,7 @@ SELECT
 '|| CASE WHEN (SELECT count(*) FROM ad_process_para pp WHERE pp.ad_process_id=f.ad_process_id AND pp.isactive='Y')>0
 THEN '
 {| border="1" cellpadding="5" cellspacing="0" align="center"
-|+''''''Process Parameteres''''''
+|+''''''Process Parameters''''''
 !style="background:#efefef;" width="100"|Name
 !style="background:#efefef;" width="150"|Description
 !style="background:#efefef;" width="300"|Help
