@@ -6,10 +6,11 @@ SELECT
 
 ''''''Help:'''''' '||coalesce(f.help,'')||'
 
-[[image:'||translate(f.name,'& /','__-')||'_-_Process_(iDempiere_1.0.0).png]]
-
-'|| CASE WHEN (SELECT count(*) FROM ad_process_para pp WHERE pp.ad_process_id=f.ad_process_id AND pp.isactive='Y')>0
+[[image:'||translate(f.name,'& /','__-')||'_-_Process_(iDempiere_1.0.0).png]]'
+|| CASE WHEN (SELECT count(*) FROM ad_process_para pp WHERE pp.ad_process_id=f.ad_process_id AND pp.isactive='Y')>0
 THEN '
+
+
 {| border="1" cellpadding="5" cellspacing="0" align="center"
 |+''''''Process Parameters''''''
 !style="background:#efefef;" width="100"|Name
@@ -19,8 +20,7 @@ THEN '
 '||
 coalesce(prm.params,'')
 ||'
-|}
-' ELSE '' END ||'
+|}' ELSE '' END ||'
 !
 ' AS wikitext
 --,m.ad_menu_id, m.ad_process_id, m.NAME, m.description, p.HELP, rv.NAME AS repviewname, p.procedurename, p.classname, p.VALUE AS searchkey, p.ISBETAFUNCTIONALITY

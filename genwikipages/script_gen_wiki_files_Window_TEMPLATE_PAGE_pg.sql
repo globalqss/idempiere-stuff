@@ -3,7 +3,7 @@
 
 
 SELECT
-'cat > "/tmp/wiki/Template:'||translate(w.name,'& /','__-')||'_(Window_ID-'||w.ad_Window_id||'_V1.0.0).wiki" <<!
+'cat <<! | sed -e ''$d'' | sed -e ''$d'' > "/tmp/wiki/Template:'||translate(w.name,'& /','__-')||'_(Window_ID-'||w.ad_Window_id||'_V1.0.0).wiki"
 = Window: '||w.name||' =
 
 ''''''Description:'''''' '||coalesce(w.description,'')||'
@@ -13,7 +13,6 @@ SELECT
 '||
 coalesce(tab.tabs,'')
 ||'
-
 !
 ' AS wikitext
 --,ad_language, ad_window_id, ad_tab_id, ad_field_id, TYPE, NAME, description, HELP, seqtab, seqfld, dbtable, dbcolumn, dbtype, adempieretype, ISBETAFUNCTIONALITY
@@ -33,7 +32,7 @@ coalesce(tab.tabs,'')
                        ||chr(10)
                        ||'
 {| border="1" cellpadding="5" cellspacing="0" align="center"
-|+''''''Process Parameters''''''
+|+''''''Fields''''''
 !style="background:#efefef;" width="100"|Name
 !style="background:#efefef;" width="150"|Description
 !style="background:#efefef;" width="300"|Help

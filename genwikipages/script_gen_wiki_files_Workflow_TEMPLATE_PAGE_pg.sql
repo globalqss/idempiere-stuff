@@ -19,7 +19,6 @@ SELECT
 coalesce(nodes.nodes,'')
 ||'
 |}
-
 !
 ' AS wikitext
 --,'en_US_base', 'F' AS TYPE, m.ad_menu_id, m.ad_workflow_id, m.NAME,m.description, f.HELP, f.ISBETAFUNCTIONALITY
