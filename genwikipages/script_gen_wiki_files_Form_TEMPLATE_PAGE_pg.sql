@@ -7,7 +7,6 @@ SELECT
 ''''''Help:'''''' '||coalesce(f.help,'')||'
 
 [[image:'||translate(f.name,'& /','__-')||'_-_Form_(iDempiere_1.0.0).png]]
-
 !
 ' AS wikitext
 --,'en_US_base', m.ad_menu_id, m.ad_form_id, m.NAME,m.description, f.HELP, f.classname, f.ISBETAFUNCTIONALITY
