@@ -26,7 +26,7 @@ SELECT     n.node_id, n.parent_id, n.depth, n.seqno,
                               )
                          )
                     ) AS technical,
-                 coalesce(p.ad_process_id, x.ad_form_id, t.ad_task_id, w.ad_window_id, f.ad_workflow_id) as id,
+                 coalesce(p.ad_process_id, x.ad_form_id, t.ad_task_id, w.ad_window_id, f.ad_workflow_id, i.ad_infowindow_id) as id,
                  COALESCE(COALESCE(x.isbetafunctionality, COALESCE(p.isbetafunctionality, COALESCE(f.isbetafunctionality, w.isbetafunctionality), ''))) as isbetafunctionality,
                  n.path
             FROM (
