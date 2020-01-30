@@ -1,9 +1,9 @@
-psql -d idempiere62 -U adempiere -f QSS_GET_TABLES_FROM_WINDOW_pg.sql > /dev/null
+psql -d idempiere71 -U adempiere -f QSS_GET_TABLES_FROM_WINDOW_pg.sql > /dev/null
 
 opentable="N"
 
 ( echo "copy (" ; cat Query_pg.sql; echo ") to stdout with csv;" ) |
-psql -d idempiere62 -U adempiere -q -t -A -F"," | sed -e 's/"//g' |
+psql -d idempiere71 -U adempiere -q -t -A -F"," | sed -e 's/"//g' |
 while IFS=, read node_id parent_id level seqno issummary name type action technical id beta rest
 do
     name=`echo $name | tr '|' ','`

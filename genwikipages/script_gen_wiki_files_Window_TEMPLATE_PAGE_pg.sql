@@ -1,9 +1,10 @@
 -- takes 12 minutes
--- from DBeaver right click on the output > Advanced Copy - no header - no row numbers - no quote
-
+-- run as
+-- psql -d idempiere -U adempiere -q -P tuples_only=on -P footer=off -Pborder=0 -P format=unaligned -f script_gen_wiki_files_Window_TEMPLATE_PAGE_pg.sql > /tmp/script_gen_wiki_files_Window_TEMPLATE_PAGE_pg.sh
+-- and then execute the generated script
 
 SELECT
-'cat <<! | sed -e ''$d'' | sed -e ''$d'' > "/tmp/wiki/Template:'||translate(w.name,'& /','__-')||'_(Window_ID-'||w.ad_Window_id||'_V1.0.0).wiki"
+'cat <<! | sed -e ''$d'' | sed -e ''$d'' > "/tmp/wiki/Template:'||translate(w.name,' /','_-')||'_(Window_ID-'||w.ad_Window_id||'_V1.0.0).wiki"
 = Window: '||w.name||' =
 
 ''''''Description:'''''' '||coalesce(w.description,'')||'
@@ -28,7 +29,16 @@ coalesce(tab.tabs,'')
                        ||coalesce(t.help,'')
                        ||chr(10)
                        ||chr(10)
-                       ||'[[image:'||translate((SELECT name FROM ad_window WHERE ad_window_id=t.ad_window_id),'& /','__-')||'_-_'||translate(t.name,'& /','__-')||'_-_Window_(iDempiere_1.0.0).png]]'
+                       ||'[[image:'
+                       ||translate((SELECT name FROM ad_window WHERE ad_window_id=t.ad_window_id),' /','_-')
+                       ||'_-_'
+                       ||translate(t.name,' /','_-')
+                       ||'_'
+                       -- 122     Country Region and City Translation
+                       -- 146     Price List      Translation
+                       -- add _SeqNo to the filename to avolid duplicates in name
+                       ||CASE WHEN (t.ad_window_id = 122 AND t.ad_tab_id = 549) OR (t.ad_window_id = 146 AND t.ad_tab_id = 200130) THEN t.seqno||'' ELSE '' END
+                       ||'-_Window_(iDempiere_1.0.0).png]]'
                        ||chr(10)
                        ||'
 {| border="1" cellpadding="5" cellspacing="0" align="center"
