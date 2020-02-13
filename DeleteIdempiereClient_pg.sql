@@ -55,6 +55,9 @@ BEGIN
     /* adrole_urolemenu */
     SELECT drop_client_inner('u_rolemenu', 'ad_role', client_id) INTO cntdel;
     totdel := totdel + cntdel;
+    /* ad_user_preference - AWieclawski */
+    SELECT drop_client_inner('ad_preference', 'ad_user', client_id) INTO cntdel;
+    totdel := totdel + cntdel;
     /* aduser_adnote */
     SELECT drop_client_inner('ad_note', 'ad_user', client_id) INTO cntdel;
     totdel := totdel + cntdel;
