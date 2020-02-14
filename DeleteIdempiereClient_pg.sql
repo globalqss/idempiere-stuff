@@ -61,6 +61,18 @@ BEGIN
     /* aduser_adnote */
     SELECT drop_client_inner('ad_note', 'ad_user', client_id) INTO cntdel;
     totdel := totdel + cntdel;
+    /* aduser_adpasswordhistory - LBober */
+    SELECT drop_client_inner('ad_password_history', 'ad_user', client_id) INTO cntdel;
+    totdel := totdel + cntdel;
+    /* mproduct_cuomconversion - LBober */
+    SELECT drop_client_inner('c_uom_conversion', 'm_product', client_id) INTO cntdel;
+    totdel := totdel + cntdel;
+    /* ctax_factacct - LBober */
+    SELECT drop_client_inner('fact_acct', 'c_tax', client_id) INTO cntdel;
+    totdel := totdel + cntdel;
+    /* pareport_columnset - AWieclawski */
+    SELECT drop_client_inner('pa_report', 'pa_reportcolumnset', client_id) INTO cntdel;
+    totdel := totdel + cntdel;
     /* end special cases */
 
     FOR r_table IN
