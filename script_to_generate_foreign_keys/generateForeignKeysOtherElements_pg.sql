@@ -47,7 +47,6 @@ WHERE NOT EXISTS (
 		cof.contype = 'f' AND
 		af.attnum = cof.conkey[1] AND
 		af.attname = LOWER (columnname))
-AND NOT (table_ref='C_ValidCombination' AND tablename IN ('A_Asset_Acct','A_Asset_Change','A_Asset_Group_Acct','A_Asset_Transfer','A_FundingMode_Acct','I_Asset'))
 AND tablename not like 'T|_%' escape '|' and tablename not in ('Test')
 ) as cmds
 order by 1;
