@@ -58,6 +58,12 @@ SYSTEMNAME=iDempiere
 SERVICENAME=idempiere
 # Binary of the service command to restart
 SERVICEBIN=/sbin/service
+# IDEMPIERE home folder
+IDEMPIERE_HOME=/opt/idempiere-server
+# Log last lines
+LOGLASTLINES=30
+# Timeout for jcmd
+JCMD_TIMEOUT=15
 
 if [ -s "`dirname $0`/daemon_monitor_server.conf" ]
 then
@@ -124,6 +130,22 @@ do
 		then
 	            echo "Cc:  $EMAIL_NOTIFYCC"
 		fi
+	        echo "========== Last log lines =========="
+	        tail -$LOGLASTLINES $( ls -t $IDEMPIERE_HOME/log/idempiere_*.log | head -1 )
+	        echo "===================================="
+	        PID=$(pgrep -f "java.*$IDEMPIERE_HOME")
+	        echo "Calling GC"
+	        timeout $JCMD_TIMEOUT jcmd $PID GC.run
+	        TS=$(date +'%Y%m%d%H%M%S')
+	        DMPFILE="$IDEMPIERE_HOME"/log/heapdump$TS.bin
+	        echo "Taking heap dump at $DMPFILE"
+	        timeout $JCMD_TIMEOUT jcmd $PID GC.heap_dump "$DMPFILE"
+	        HISTOFILE="$IDEMPIERE_HOME"/log/histogram$TS.txt
+	        echo "Taking class histogram at $HISTOFILE"
+	        timeout $JCMD_TIMEOUT jcmd $PID GC.class_histogram > "$HISTOFILE"
+	        THREADFILE="$IDEMPIERE_HOME"/log/threads$TS.txt
+	        echo "Taking thread print at $THREADFILE"
+	        timeout $JCMD_TIMEOUT jcmd $PID Thread.print > "$THREADFILE"
 	        echo "Executing time $SERVICEBIN $SERVICENAME restart:"
 	        time $SERVICEBIN $SERVICENAME restart
 	    ) 2>&1 | $CMDMAIL
