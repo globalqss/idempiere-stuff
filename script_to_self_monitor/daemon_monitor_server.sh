@@ -130,8 +130,9 @@ do
 		then
 	            echo "Cc:  $EMAIL_NOTIFYCC"
 		fi
-	        echo "========== Last log lines =========="
-	        tail -$LOGLASTLINES $( ls -t $IDEMPIERE_HOME/log/idempiere_*.log | head -1 )
+		LASTLOGFILE=$( ls -t $IDEMPIERE_HOME/log/idempiere_*.log | head -1 )
+	        echo "========== Last log lines $( basename $LASTLOGFILE ) =========="
+	        tail -$LOGLASTLINES $LASTLOGFILE
 	        echo "===================================="
 	        PID=$(pgrep -f "java.*$IDEMPIERE_HOME")
 	        echo "Calling GC"
