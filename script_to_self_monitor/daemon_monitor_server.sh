@@ -98,7 +98,7 @@ do
     then
 	if [ $CONSECUTIVE -eq $ALLOWED_CONSECUTIVE_RESTARTS ]
 	then
-            $DEBUG "CONSECUTIVE = ALLOWED_CONSECUTIVE_RESTARTS ... stopping process"
+            $DEBUG "CONSECUTIVE = ALLOWED_CONSECUTIVE_RESTARTS ( $ALLOWED_CONSECUTIVE_RESTARTS ) ... stopping restarting process"
             (
 		echo "Subject: $SYSTEMNAME `hostname` self-monitor MAX consecutive restarts reached - manual action required `date +'%Y-%m-%d %H:%M:%S'`"
 		if [ -n "$EMAIL_NOTIFY" ]
@@ -156,15 +156,13 @@ do
             CONSECUTIVE=`expr $CONSECUTIVE + 1`
             $DEBUG CONSECUTIVE=$CONSECUTIVE
 	else
-	    $DEBUG "OK, wait $GRACE_SECONDS ..."
+	    $DEBUG "waiting grace period $GRACE_SECONDS ..."
 	    sleep $GRACE_SECONDS
 	    continue
 	fi
     else
         CONSECUTIVE=0
-        # $DEBUG CONSECUTIVE=$CONSECUTIVE
 	RETRIES=0
-        # $DEBUG RETRIES=$RETRIES
     fi
     $DEBUG "waiting next cycle $SECONDS_CYCLE ..."
     sleep $SECONDS_CYCLE
