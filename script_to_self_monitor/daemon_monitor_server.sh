@@ -12,9 +12,9 @@
 # - give execute permissions
 #     chmod 700 /root/daemon_monitor_server.sh
 # - install automatic execution on reboot with crontab -e
-#     @reboot bash /root/daemon_monitor_server.sh > /tmp/daemon_monitor_server.log 2>&1
+#     @reboot bash /root/daemon_monitor_server.sh >> /var/log/daemon_monitor_server.log 2>&1
 # - start manually with 
-#     nohup bash /root/daemon_monitor_server.sh > /tmp/daemon_monitor_server.log 2>&1 &
+#     nohup bash /root/daemon_monitor_server.sh >> /var/log/daemon_monitor_server.log 2>&1 &
 # - stop manually with
 #     pkill -f daemon_monitor_server
 #
@@ -50,8 +50,8 @@ GRACE_SECONDS=15
 GRACE_RETRIES=3
 # Max of consecutive restarts before giving up
 ALLOWED_CONSECUTIVE_RESTARTS=3
-# Debug command, if empty then no output is logged
-DEBUG=echo
+# Debug command, if set to false then no output is logged
+DEBUG='eval echo $(date "+%Y-%m-%d %H:%M:%S - ")'
 # Name of the system being monitored
 SYSTEMNAME=iDempiere
 # Name of the service in /etc/init.d
@@ -94,7 +94,6 @@ do
 	continue
     fi
     CNT=`curl -m $GRACE_SECONDS -s "$URL" | fgrep "$STRING" | wc -l`
-    $DEBUG CNT=$CNT
     if [ $CNT != 1 ]
     then
 	if [ $CONSECUTIVE -eq $ALLOWED_CONSECUTIVE_RESTARTS ]
@@ -135,18 +134,21 @@ do
 	        tail -$LOGLASTLINES $LASTLOGFILE
 	        echo "===================================="
 	        PID=$(pgrep -f "java.*$IDEMPIERE_HOME")
-	        echo "Calling GC"
-	        timeout $JCMD_TIMEOUT jcmd $PID GC.run
-	        TS=$(date +'%Y%m%d%H%M%S')
-	        DMPFILE="$IDEMPIERE_HOME"/log/heapdump$TS.bin
-	        echo "Taking heap dump at $DMPFILE"
-	        timeout $JCMD_TIMEOUT jcmd $PID GC.heap_dump "$DMPFILE"
-	        HISTOFILE="$IDEMPIERE_HOME"/log/histogram$TS.txt
-	        echo "Taking class histogram at $HISTOFILE"
-	        timeout $JCMD_TIMEOUT jcmd $PID GC.class_histogram > "$HISTOFILE"
-	        THREADFILE="$IDEMPIERE_HOME"/log/threads$TS.txt
-	        echo "Taking thread print at $THREADFILE"
-	        timeout $JCMD_TIMEOUT jcmd $PID Thread.print > "$THREADFILE"
+		if [ -n "$PID" ]
+		then
+		    echo "Calling GC"
+		    timeout $JCMD_TIMEOUT jcmd $PID GC.run
+		    TS=$(date +'%Y%m%d%H%M%S')
+		    DMPFILE="$IDEMPIERE_HOME"/log/heapdump$TS.bin
+		    echo "Taking heap dump at $DMPFILE"
+		    timeout $JCMD_TIMEOUT jcmd $PID GC.heap_dump "$DMPFILE"
+		    HISTOFILE="$IDEMPIERE_HOME"/log/histogram$TS.txt
+		    echo "Taking class histogram at $HISTOFILE"
+		    timeout $JCMD_TIMEOUT jcmd $PID GC.class_histogram > "$HISTOFILE"
+		    THREADFILE="$IDEMPIERE_HOME"/log/threads$TS.txt
+		    echo "Taking thread print at $THREADFILE"
+		    timeout $JCMD_TIMEOUT jcmd $PID Thread.print > "$THREADFILE"
+		fi
 	        echo "Executing time $SERVICEBIN $SERVICENAME restart:"
 	        time $SERVICEBIN $SERVICENAME restart
 	    ) 2>&1 | $CMDMAIL
@@ -154,15 +156,15 @@ do
             CONSECUTIVE=`expr $CONSECUTIVE + 1`
             $DEBUG CONSECUTIVE=$CONSECUTIVE
 	else
-	    $DEBUG "waiting grace period $GRACE_SECONDS ..."
+	    $DEBUG "OK, wait $GRACE_SECONDS ..."
 	    sleep $GRACE_SECONDS
 	    continue
 	fi
     else
         CONSECUTIVE=0
-        $DEBUG CONSECUTIVE=$CONSECUTIVE
+        # $DEBUG CONSECUTIVE=$CONSECUTIVE
 	RETRIES=0
-        $DEBUG RETRIES=$RETRIES
+        # $DEBUG RETRIES=$RETRIES
     fi
     $DEBUG "waiting next cycle $SECONDS_CYCLE ..."
     sleep $SECONDS_CYCLE
