@@ -9,7 +9,7 @@ SELECT
 
 ''''''Help:'''''' '||coalesce(f.help,'')||'
 
-[[image:'||translate(f.name,' /','_-')||'_-_Workflow_(iDempiere_1.0.0).png]]
+[[Image:'||translate(f.name,' /','_-')||'_-_Workflow_(iDempiere_1.0.0).png|border]]
 
 {| border="1" cellpadding="5" cellspacing="0" align="center"
 |+''''''Workflow Nodes''''''
@@ -47,12 +47,13 @@ coalesce(nodes.nodes,'')
                     WITH RECURSIVE nodeswf(ad_workflow_id, ad_wf_node_id, ad_wf_next_id, DEPTH) AS (
                         SELECT w.ad_workflow_id, w.ad_wf_node_id,      wnn.ad_wf_next_id,  1
                             FROM ad_workflow w
-                                JOIN ad_wf_nodenext wnn ON wnn.ad_wf_node_id=w.ad_wf_node_id 
+                                JOIN ad_wf_nodenext wnn ON wnn.ad_wf_node_id=w.ad_wf_node_id AND wnn.isactive='Y'
+                            WHERE w.isactive='Y'
                       UNION
                         SELECT wn.ad_workflow_id, wn.ad_wf_node_id, wnn.ad_wf_next_id, nodeswf.depth+1
                             FROM ad_wf_node wn
                                 JOIN nodeswf ON nodeswf.ad_wf_next_id=wn.ad_wf_node_id
-                                LEFT JOIN ad_wf_nodenext wnn ON wnn.ad_wf_node_id=wn.ad_wf_node_id
+                                LEFT JOIN ad_wf_nodenext wnn ON wnn.ad_wf_node_id=wn.ad_wf_node_id AND wnn.isactive='Y'
                         )
                     SELECT * FROM nodeswf
                     ) AS tr

@@ -9,7 +9,7 @@ SELECT
 
 ''''''Help:'''''' '||coalesce(f.help,'')||'
 
-[[image:'||translate(f.name,' /','_-')||'_-_Task_(iDempiere_1.0.0).png]]
+[[Image:'||translate(f.name,' /','_-')||'_-_Task_(iDempiere_1.0.0).png|border]]
 !
 ' AS wikitext
 --,'en_US_base', m.ad_menu_id, m.ad_task_id, m.NAME,m.description, f.HELP, f.classname, f.ISBETAFUNCTIONALITY

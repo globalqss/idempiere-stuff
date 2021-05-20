@@ -9,7 +9,7 @@ SELECT
 
 ''''''Help:'''''' '||coalesce(f.help,'')||'
 
-[[image:'||translate(f.name,' /','_-')||'_-_Report_(iDempiere_1.0.0).png]]'
+[[Image:'||translate(f.name,' /','_-')||'_-_Report_(iDempiere_1.0.0).png|border]]'
 || CASE WHEN (SELECT count(*) FROM ad_process_para pp WHERE pp.ad_process_id=f.ad_process_id AND pp.isactive='Y')>0
 THEN '
 
