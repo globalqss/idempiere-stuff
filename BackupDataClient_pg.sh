@@ -36,7 +36,7 @@ then
 Usage: $0 ad_client_id dbname hostname username port
 
 Parameters:
-1 - AD_Client_ID
+1 - AD_Client_ID (comma separated ids from client)
 2 - DB Name
 3 - Host name
 4 - User name
@@ -44,26 +44,29 @@ Parameters:
 
 Examples of usage:
 To export System and GardenWorld from the database idempiere
-BackupDataClient_pg.sh 11 idempiere localhost adempiere 5432
+BackupDataClient_pg.sh 0,11 idempiere localhost adempiere 5432
 To export just System
 BackupDataClient_pg.sh 0 idempiere localhost adempiere 5432
+To export just GardenWorld
+BackupDataClient_pg.sh 11 idempiere localhost adempiere 5432
 " > /dev/tty
     exit 1
 fi
 
-CLIENTVALUE=`echo 'select value from ad_client where ad_client_id=:clientid' | psql --tuples-only --no-align --quiet -h ${HOSTNAME} -U ${USERNAME} -d ${DBNAME} -v clientid=${AD_CLIENT_ID}`
+CLIENTVALUE=`echo "select string_agg(value,'+') from ad_client where ad_client_id in (:clientid)" | psql --tuples-only --no-align --quiet -h ${HOSTNAME} -p ${PORT} -U ${USERNAME} -d ${DBNAME} -v clientid=${AD_CLIENT_ID}`
 OUTFILE=BackupData_${DBNAME}_${CLIENTVALUE}_${AD_CLIENT_ID}.dmp
 
 # prepare a query to obtain the data in one transaction - filtering tables and clients
 echo "BEGIN;" > /tmp/get$$
 echo "
 SELECT '
+/* all tables with ad_client_id column */
 SELECT ''--
 -- Data for Name: '||table_name||'; Type: TABLE DATA; Schema: adempiere; Owner: adempiere
 --
 
 COPY '||table_name||' ('||col_columns||') FROM stdin;'';
-COPY (SELECT '||col_columns||' FROM '||table_name||' WHERE ad_client_id=:clientid) TO stdout;
+COPY (SELECT '||col_columns||' FROM '||table_name||' WHERE ad_client_id in (:clientid)) TO stdout;
 SELECT ''\.
 '';'
 FROM information_schema.tables t
@@ -71,25 +74,40 @@ JOIN (SELECT table_name AS col_table_name, string_agg(case when column_name='lim
 WHERE table_schema='adempiere' AND table_type='BASE TABLE'
 AND EXISTS (SELECT 1 FROM information_schema.columns c WHERE c.table_name=t.table_name AND c.column_name='ad_client_id')
 UNION
+/* ad_pinstance_log - required but it doesn't have ad_client_id */
 SELECT '
 SELECT ''--
 -- Data for Name: '||table_name||'; Type: TABLE DATA; Schema: adempiere; Owner: adempiere
 --
 
 COPY '||table_name||' ('||col_columns||') FROM stdin;'';
-COPY (SELECT '||col_columns||' FROM '||table_name||' WHERE ad_pinstance_id IN (SELECT ad_pinstance_id FROM ad_pinstance WHERE ad_client_id=:clientid)) TO stdout;
+COPY (SELECT '||col_columns||' FROM '||table_name||' WHERE ad_pinstance_id IN (SELECT ad_pinstance_id FROM ad_pinstance WHERE ad_client_id IN (:clientid))) TO stdout;
 SELECT ''\.
 '';'
 FROM information_schema.tables t
 JOIN (SELECT table_name AS col_table_name, string_agg(case when column_name='limit' then '\"limit\"' else column_name end,', ') AS col_columns from information_schema.columns c GROUP BY table_name) c ON (c.col_table_name=t.table_name)
 WHERE table_name='ad_pinstance_log'
+UNION
+/* dual - required but it doesn't have ad_client_id */
+SELECT '
+SELECT ''--
+-- Data for Name: '||table_name||'; Type: TABLE DATA; Schema: adempiere; Owner: adempiere
+--
+
+COPY '||table_name||' ('||col_columns||') FROM stdin;'';
+COPY (SELECT '||col_columns||' FROM '||table_name||') TO stdout;
+SELECT ''\.
+'';'
+FROM information_schema.tables t
+JOIN (SELECT table_name AS col_table_name, string_agg(case when column_name='limit' then '\"limit\"' else column_name end,', ') AS col_columns from information_schema.columns c GROUP BY table_name) c ON (c.col_table_name=t.table_name)
+WHERE table_name='dual'
 ORDER BY 1
-" | psql --tuples-only --no-align --quiet -h ${HOSTNAME} -U ${USERNAME} -d ${DBNAME} >> /tmp/get$$
+" | psql --tuples-only --no-align --quiet -h ${HOSTNAME} -p ${PORT} -U ${USERNAME} -d ${DBNAME} >> /tmp/get$$
 
 # get the data
 echo "BEGIN;
 " > ${OUTFILE}
-psql --tuples-only --no-align --quiet -h ${HOSTNAME} -U ${USERNAME} -d ${DBNAME} -v clientid=${AD_CLIENT_ID} -f /tmp/get$$ >> ${OUTFILE}
+psql --tuples-only --no-align --quiet -h ${HOSTNAME} -p ${PORT} -U ${USERNAME} -d ${DBNAME} -v clientid=${AD_CLIENT_ID} -f /tmp/get$$ >> ${OUTFILE}
 echo "
 COMMIT;" >> ${OUTFILE}
 

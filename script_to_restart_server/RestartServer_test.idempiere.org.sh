@@ -32,7 +32,6 @@ then
     echo "** Updating iDempiere from p2 repository - $(date +'%Y-%m-%d %H:%M:%S')"
     cd /opt/idempiere-server || exit 1
     bash update.sh https://jenkins.idempiere.org/job/iDempiere/ws/org.idempiere.p2/target/repository/
-    bash update-prd.sh https://jenkins.idempiere.org/job/idempiere-webstore/ws/org.idempiere.webstore.p2/target/repository/ org.adempiere.webstore.feature.feature.group
     cd /opt/idempiere-server/utils || exit 1
     if [ ! -s RUN_SyncDB.sh ]
     then
@@ -47,6 +46,15 @@ then
 	    exit 1
 	fi
     fi
+
+    # install webstore
+    sudo /usr/sbin/service idempiere start
+    sleep 20
+    ( echo uninstall org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
+    ( echo install https://jenkins.idempiere.org/job/idempiere-webstore/ws/org.adempiere.webstore/target/org.adempiere.webstore-9.0.0-SNAPSHOT.jar; sleep 3 ) | telnet localhost 12612
+    ( echo setbsl 5 org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
+    sudo /usr/sbin/service idempiere stop
+
 fi
 
 if [ "$ACTION" = "reinstall" ] || [ "$ACTION" = "recreate" ]
@@ -95,7 +103,13 @@ then
       # -repository $REPO \
       # -i $PRODUCT
 
-    bash update-prd.sh https://jenkins.idempiere.org/job/idempiere-webstore/ws/org.idempiere.webstore.p2/target/repository/ org.adempiere.webstore.feature.feature.group
+    # install webstore
+    sudo /usr/sbin/service idempiere start
+    sleep 20
+    ( echo uninstall org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
+    ( echo install https://jenkins.idempiere.org/job/idempiere-webstore/ws/org.adempiere.webstore/target/org.adempiere.webstore-9.0.0-SNAPSHOT.jar; sleep 3 ) | telnet localhost 12612
+    ( echo setbsl 5 org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
+    sudo /usr/sbin/service idempiere stop
 
 fi
 
