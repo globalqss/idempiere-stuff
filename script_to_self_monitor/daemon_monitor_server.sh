@@ -42,7 +42,7 @@ SENDMAILBIN=/usr/sbin/sendmail
 # URL to check
 URL=http://localhost:8080/webui/index.zul
 # Token string to check on loaded page
-STRING=onLoadToken
+STRING=Processing...
 # Check every SECONDS_CYCLE seconds
 SECONDS_CYCLE=60
 # After a fail to get the token, wait GRACE_SECONDS seconds to retry GRACE_RETRIES times
@@ -93,7 +93,7 @@ do
         sleep $SECONDS_CYCLE
 	continue
     fi
-    CNT=`curl -m $GRACE_SECONDS -s "$URL" | fgrep "$STRING" | wc -l`
+    CNT=`curl -H "X-PING: true" -m $GRACE_SECONDS -s "$URL" | fgrep "$STRING" | wc -l`
     if [ $CNT != 1 ]
     then
 	if [ $CONSECUTIVE -eq $ALLOWED_CONSECUTIVE_RESTARTS ]
