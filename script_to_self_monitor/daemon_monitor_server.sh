@@ -42,7 +42,7 @@ SENDMAILBIN=/usr/sbin/sendmail
 # URL to check
 URL=http://localhost:8080/webui/index.zul
 # Token string to check on loaded page
-STRING=Processing...
+STRING="Sorry, JavaScript must be enabled."
 # Check every SECONDS_CYCLE seconds
 SECONDS_CYCLE=60
 # After a fail to get the token, wait GRACE_SECONDS seconds to retry GRACE_RETRIES times
