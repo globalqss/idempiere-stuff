@@ -71,7 +71,7 @@ fi
 
 # update build ID on db version
 TODAY=`date +%Y%m%d`
-echo "update ad_system set lastmigrationscriptapplied = '${TODAY}_Daily9Build' || $BUILD_NUMBER || '/' || lastmigrationscriptapplied;" | sqlplus $ADEMPIERE_DB_USER/$ADEMPIERE_DB_PASSWORD@$HOST/$DATABASE
+echo "update ad_system set lastmigrationscriptapplied = '${TODAY}_Daily9Build' || $BUILD_NUMBER || '/' || lastmigrationscriptapplied;" | sqlplus $ADEMPIERE_DB_USER/$ADEMPIERE_DB_PASSWORD@$ADEMPIERE_DB_SERVER/$ADEMPIERE_DB_NAME
 
 # Recreate seed
 cd /tmp
