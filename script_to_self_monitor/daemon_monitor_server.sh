@@ -98,7 +98,7 @@ do
     then
 	if [ $CONSECUTIVE -eq $ALLOWED_CONSECUTIVE_RESTARTS ]
 	then
-            $DEBUG "CONSECUTIVE = ALLOWED_CONSECUTIVE_RESTARTS ( $ALLOWED_CONSECUTIVE_RESTARTS ) ... stopping restarting process"
+            $DEBUG "CONSECUTIVE = ALLOWED_CONSECUTIVE_RESTARTS $ALLOWED_CONSECUTIVE_RESTARTS ... stopping restarting process"
             (
 		echo "Subject: $SYSTEMNAME `hostname` self-monitor MAX consecutive restarts reached - manual action required `date +'%Y-%m-%d %H:%M:%S'`"
 		if [ -n "$EMAIL_NOTIFY" ]
