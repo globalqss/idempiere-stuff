@@ -40,7 +40,7 @@ EMAIL_FROM=root@`hostname`
 SENDMAILBIN=/usr/sbin/sendmail
 
 # URL to check
-URL=http://localhost:8080/webui/index.zul
+URL=https://localhost:8443/webui/index.zul
 # Token string to check on loaded page
 STRING="Sorry, JavaScript must be enabled."
 # Check every SECONDS_CYCLE seconds
@@ -93,7 +93,7 @@ do
         sleep $SECONDS_CYCLE
 	continue
     fi
-    CNT=`curl -H "X-PING: true" -m $GRACE_SECONDS -s "$URL" | fgrep "$STRING" | wc -l`
+    CNT=`curl -H "X-PING: true" -m $GRACE_SECONDS -k -s "$URL" | fgrep "$STRING" | wc -l`
     if [ $CNT != 1 ]
     then
 	if [ $CONSECUTIVE -eq $ALLOWED_CONSECUTIVE_RESTARTS ]
