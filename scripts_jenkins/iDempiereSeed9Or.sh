@@ -14,6 +14,7 @@ docker_exec.sh chown oracle:dba /tmp/Adempiere.dmp
 export IDEMPIERE_HOME="$REPO"
 export ADEMPIERE_DB_USER=reference
 export ADEMPIERE_DB_SERVER=172.16.7.1
+export ADEMPIERE_DB_PORT=1521
 export ADEMPIERE_DB_PATH=oracle
 export ADEMPIERE_DB_NAME=xe
 export ADEMPIERE_DB_PASSWORD=idempiere
