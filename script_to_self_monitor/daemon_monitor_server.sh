@@ -48,6 +48,8 @@ SECONDS_CYCLE=60
 # After a fail to get the token, wait GRACE_SECONDS seconds to retry GRACE_RETRIES times
 GRACE_SECONDS=15
 GRACE_RETRIES=3
+# Minutes of grace after a reboot before trying a restart
+GRACE_MINUTES_REBOOT=5
 # Max of consecutive restarts before giving up
 ALLOWED_CONSECUTIVE_RESTARTS=3
 # Debug command, if set to false then no output is logged
@@ -57,7 +59,7 @@ SYSTEMNAME=iDempiere
 # Name of the service in /etc/init.d
 SERVICENAME=idempiere
 # Binary of the service command to restart
-SERVICEBIN=/sbin/service
+SERVICEBIN=/bin/systemctl
 # IDEMPIERE home folder
 IDEMPIERE_HOME=/opt/idempiere-server
 # Log last lines
@@ -76,6 +78,17 @@ then
 else
     CMDMAIL="cat"
 fi
+
+while true
+do
+    UPTIMEMIN=$(expr "$(uptime --pretty)" : '^up \([0-9]*\) minute')
+    if [ -z "$UPTIMEMIN" ] || [ "$UPTIMEMIN" -gt "$GRACE_MINUTES_REBOOT" ]
+    then
+	break;
+    fi
+    $DEBUG "grace time after reboot ..."
+    sleep $SECONDS_CYCLE
+done
 
 CONSECUTIVE=0
 RETRIES=0
@@ -149,8 +162,8 @@ do
 		    echo "Taking thread print at $THREADFILE"
 		    timeout $JCMD_TIMEOUT jcmd $PID Thread.print > "$THREADFILE"
 		fi
-	        echo "Executing time $SERVICEBIN $SERVICENAME restart:"
-	        time $SERVICEBIN $SERVICENAME restart
+	        echo "Executing time $SERVICEBIN restart $SERVICENAME:"
+	        time $SERVICEBIN restart $SERVICENAME
 	    ) 2>&1 | $CMDMAIL
 	    RETRIES=0
             CONSECUTIVE=`expr $CONSECUTIVE + 1`
