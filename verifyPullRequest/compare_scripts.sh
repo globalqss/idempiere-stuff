@@ -2,7 +2,7 @@
 # This is a sample of a verifier used by Carlos Ruiz to check migration scripts in pull requests within iDempiere
 #
 # Usage: compare_scripts [unique_filename_portion_of_the_script]
-# To verify the scripts migration/i8.2z/postgresql/202102011400_IDEMPIERE-4688.sql and migration/i8.2z/oracle/202102011400_IDEMPIERE-4688.sql
+# To verify the scripts migration/iD10/postgresql/202102011400_IDEMPIERE-4688.sql and migration/iD10/oracle/202102011400_IDEMPIERE-4688.sql
 #  compare_scripts.sh 202102011400_IDEMPIERE-4688.sql
 #     or
 #  compare_scripts.sh 202102011400
@@ -16,19 +16,19 @@
 #
 
 BASE=~/gitIdempiere/localdev/migration
-FOLDER=i8.2z
-if [ "x$2" = "x82" ]
+FOLDER=iD10
+if [ "x$2" = "x9" ]
 then
-    BASE=~/gitIdempiere/local82/migration
-    FOLDER=i7.1
+    BASE=~/gitIdempiere/local9/migration
+    FOLDER=i9
 fi
 SCRIPT=$1
 
-OR=`find $BASE -name "$1*" | fgrep /oracle/`
-PG=`find $BASE -name "$1*" | fgrep /postgresql/`
+OR=$(find $BASE -name "$1*" | fgrep /oracle/)
+PG=$(find $BASE -name "$1*" | fgrep /postgresql/)
 
-TMPOR=/tmp/`basename $OR`.oracle
-TMPPG=/tmp/`basename $PG`.postgresql
+TMPOR=/tmp/$(basename $OR).oracle
+TMPPG=/tmp/$(basename $PG).postgresql
 
 sed -e '
 /SET SQLBLANKLINES ON/d
@@ -36,22 +36,26 @@ sed -e '
 3{/^[[:space:]]*$/d}
 ' $OR > $TMPOR
 
-sed -e '
-s/TO_TIMESTAMP/TO_DATE/g
-s/TIMESTAMP DEFAULT statement_timestamp()/DATE DEFAULT SYSDATE/g
-s/statement_timestamp()/getDate()/g
-s/now()/sysdate/g
-s/,"action",/,Action,/g
-s/,"limit",/,Limit,/g
-s/NUMERIC(/NUMBER(/g
-s/ NUMERIC / NUMBER /g
-s/EntityType VARCHAR(/EntityType VARCHAR2(/
-s/AD_Language VARCHAR(/AD_Language VARCHAR2(/
-s/VARCHAR(/VARCHAR2(/g
-s/TIMESTAMP NOT NULL/DATE NOT NULL/g
-s/TIMESTAMP DEFAULT NULL/DATE DEFAULT NULL/g
-s/ADD COLUMN/ADD/g
-' $PG |
+REPL="$REPL"$'\ns/TIMESTAMP DEFAULT statement_timestamp()/DATE DEFAULT SYSDATE/g'
+REPL="$REPL"$'\ns/statement_timestamp()/getDate()/g'
+REPL="$REPL"$'\ns/now()/sysdate/g'
+REPL="$REPL"$'\ns/,"action",/,Action,/g'
+REPL="$REPL"$'\ns/,"limit",/,Limit,/g'
+REPL="$REPL"$'\ns/NUMERIC(/NUMBER(/g'
+REPL="$REPL"$'\ns/ NUMERIC / NUMBER /g'
+REPL="$REPL"$'\ns/EntityType VARCHAR(/EntityType VARCHAR2(/'
+REPL="$REPL"$'\ns/AD_Language VARCHAR(/AD_Language VARCHAR2(/'
+REPL="$REPL"$'\ns/VARCHAR(/VARCHAR2(/g'
+REPL="$REPL"$'\ns/TIMESTAMP NOT NULL/DATE NOT NULL/g'
+REPL="$REPL"$'\ns/TIMESTAMP DEFAULT NULL/DATE DEFAULT NULL/g'
+REPL="$REPL"$'\ns/ADD COLUMN/ADD/g'
+if ! grep -q TO_TIMESTAMP "$TMPOR"
+then
+    REPL="$REPL"$'\ns/TO_TIMESTAMP/TO_DATE/g'
+fi
+# s/TO_TIMESTAMP/TO_DATE/g
+# when required, and delete when not required
+sed -e "$REPL" $PG |
 sed -e "s/DEFAULT '0'/DEFAULT 0/g" > $TMPPG
 # s/statement_timestamp()/SysDate/g
 
@@ -80,12 +84,20 @@ echo "***** Possible wrong entitytype *****"
 tput setaf 1
 fgrep -n "'U'" $PG
 tput sgr0
+echo "***** adempiere. *****"
+tput setaf 1
+fgrep -n -i "adempiere." $PG
+tput sgr0
+echo "***** casting with :: *****"
+tput setaf 1
+fgrep -n -i "::" $PG
+tput sgr0
 echo "***** create sequence *****"
 tput setaf 1
 fgrep -n -i "create sequence" $PG
 tput sgr0
 echo "***** Check register file *****"
-CNT=`fgrep "register_migration_script" $PG | wc -l`
+CNT=$(fgrep -i "register_migration_script" $PG | wc -l)
 if [ $CNT -ne 1 ]
 then
     tput setaf 1
@@ -93,7 +105,7 @@ then
     tput sgr0
 else
     tput setaf 1
-    fgrep -n "register_migration_script" $PG | fgrep -v "'`basename $PG`'"
+    fgrep -in "register_migration_script" $PG | fgrep -v "'$(basename $PG)'"
     tput sgr0
 fi
 ### END POSTGRESQL VERIFICATION
@@ -171,4 +183,14 @@ else
     echo "differences, opening meld ..."
     tput sgr0
     meld $TMPOR $TMPPG &
+fi
+
+if egrep -i '(^CREATE|^ALTER)' $TMPOR > /dev/null
+then
+    echo "***** SUMMARY CREATE/ALTER *****"
+    tput setaf 3
+    egrep -i '(^CREATE|^ALTER)' $TMPOR
+    tput sgr0
+else
+    echo "***** NO CREATE/ALTER *****"
 fi

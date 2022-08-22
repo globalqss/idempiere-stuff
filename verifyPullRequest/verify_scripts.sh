@@ -19,7 +19,7 @@ do
     fi
     echo "
 Verifying $FILE ..."
-    compare_scripts.sh $FILE
+    compare_scripts.sh $FILE $1
 done
     echo "
 Verification finished"
