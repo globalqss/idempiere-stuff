@@ -81,12 +81,12 @@ fi
 
 while true
 do
-    UPTIMEMIN=$(expr "$(uptime --pretty)" : '^up \([0-9]*\) minute')
+    UPTIMEMIN=$(awk '{print int($0/60);}' /proc/uptime)
     if [ -z "$UPTIMEMIN" ] || [ "$UPTIMEMIN" -gt "$GRACE_MINUTES_REBOOT" ]
     then
-	break;
+        break
     fi
-    $DEBUG "grace time after reboot ..."
+    $DEBUG "grace time after reboot ... uptime $UPTIMEMIN minutes"
     sleep $SECONDS_CYCLE
 done
 
