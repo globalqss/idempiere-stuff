@@ -16,11 +16,11 @@
 #
 
 BASE=~/gitIdempiere/localdev/migration
-FOLDER=iD10
-if [ "x$2" = "x9" ]
+FOLDER=iD11
+if [ "x$2" = "x10" ]
 then
-    BASE=~/gitIdempiere/local9/migration
-    FOLDER=i9
+    BASE=~/gitIdempiere/local10/migration
+    FOLDER=iD10
 fi
 SCRIPT=$1
 
