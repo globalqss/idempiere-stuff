@@ -41,7 +41,7 @@ SENDMAILBIN=/usr/sbin/sendmail
 
 # URL to check
 URL=https://localhost:8443/webui/index.zul
-# Token string to check on loaded page
+# Token string to check on loaded page.  When using SSO a different string must be checked from the login page of the SSO provider
 STRING="Sorry, JavaScript must be enabled."
 # Check every SECONDS_CYCLE seconds
 SECONDS_CYCLE=60
@@ -106,7 +106,7 @@ do
         sleep $SECONDS_CYCLE
 	continue
     fi
-    CNT=`curl -H "X-PING: true" -m $GRACE_SECONDS -k -s "$URL" | fgrep "$STRING" | wc -l`
+    CNT=`curl -L -H "X-PING: true" -m $GRACE_SECONDS -k -s "$URL" | fgrep "$STRING" | wc -l`
     if [ $CNT != 1 ]
     then
 	if [ $CONSECUTIVE -eq $ALLOWED_CONSECUTIVE_RESTARTS ]
