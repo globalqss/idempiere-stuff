@@ -11,7 +11,7 @@ export ADEMPIERE_DB_PATH=postgresql
 cd /tmp
 rm Adempiere_pg.dmp
 # unzip -u ${REPO}/org.adempiere.server-feature/data/seed/Adempiere_pg.jar
-unzip -u /home/idempiere/seed9/Adempiere_pg.jar
+unzip -u /home/idempiere/seed11/Adempiere_pg.jar
 ls -l /tmp/Adempiere_pg.dmp
 
 export PGPASSWORD="$ADEMPIERE_DB_PASSWORD"

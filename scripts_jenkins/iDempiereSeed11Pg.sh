@@ -1,6 +1,6 @@
-wget -O /var/lib/jenkins/workspace/iDempiereDaily/org.adempiere.server-feature/data/seed/Adempiere_pg.jar https://raw.githubusercontent.com/idempiere/binary.file/master/database/10/Adempiere_pg.jar
+# exit 0 # Release time
 
-REPO=/var/lib/jenkins/workspace/iDempiereDaily
+REPO=/var/lib/jenkins/workspace/iDempiere11Daily
 
 export IDEMPIERE_HOME="$REPO"
 export ADEMPIERE_DB_NAME=idempiere
@@ -11,8 +11,9 @@ export ADEMPIERE_DB_PASSWORD=idempiere
 export ADEMPIERE_DB_PATH=postgresql
 
 cd /tmp
-rm Adempiere_pg.dmp
-unzip -u ${REPO}/org.adempiere.server-feature/data/seed/Adempiere_pg.jar
+rm -f Adempiere_pg.dmp
+# unzip -u ${REPO}/org.adempiere.server-feature/data/seed/Adempiere_pg.jar
+unzip -u /home/idempiere/seed11/Adempiere_pg.jar
 ls -l /tmp/Adempiere_pg.dmp
 
 export PGPASSWORD="$ADEMPIERE_DB_PASSWORD"
@@ -34,11 +35,7 @@ fi
 
 # update build ID on db version
 TODAY=`date +%Y%m%d`
-echo "UPDATE AD_MIGRATIONSCRIPT
-SET AD_MIGRATIONSCRIPT_ID =
-AD_MIGRATIONSCRIPT_ID-((SELECT min(ad_migrationscript_id) FROM ad_migrationscript WHERE ad_migrationscript_id>=1000000)
--(SELECT max(ad_migrationscript_id) FROM ad_migrationscript WHERE ad_migrationscript_id<1000000)-1)
-WHERE AD_MIGRATIONSCRIPT_ID>=1000000" | $PSQLCMD
+echo "update ad_system set lastmigrationscriptapplied = '${TODAY}_Daily11Build' || $BUILD_NUMBER || '/' || lastmigrationscriptapplied" | $PSQLCMD
 
 # Recreate seed
 cd /tmp
@@ -46,6 +43,9 @@ pg_dump -U $ADEMPIERE_DB_USER -h $ADEMPIERE_DB_SERVER -p $ADEMPIERE_DB_PORT $ADE
 mv ExpDat${ADEMPIERE_DB_NAME}_pg.dmp Adempiere_pg.dmp
 rm ${REPO}/org.adempiere.server-feature/data/seed/Adempiere_pg.jar
 zip -9 ${REPO}/org.adempiere.server-feature/data/seed/Adempiere_pg.jar Adempiere_pg.dmp
-rm -f Adempiere_pg.dmp
+rm Adempiere_pg.dmp
+mkdir -p /tmp/seed11
+rm -f /tmp/seed11/Adempiere_pg.jar
+cp -p ${REPO}/org.adempiere.server-feature/data/seed/Adempiere_pg.jar /tmp/seed11/
 
 exit 0

@@ -1,8 +1,10 @@
-REPO=/var/lib/jenkins/workspace/iDempiereDaily
+# exit 0 # Release time
+
+REPO=/var/lib/jenkins/workspace/iDempiere10Daily
 cd /tmp
 rm -f Adempiere.dmp
 # unzip -u ${REPO}/org.adempiere.server-feature/data/seed/Adempiere.jar
-unzip -u /home/idempiere/seed11/Adempiere.jar
+unzip -u /home/idempiere/seed10/Adempiere.jar
 ls -l /tmp/Adempiere.dmp
 # export NLS_LANG=AMERICAN_AMERICA.UTF8
 docker_start.sh
@@ -70,7 +72,7 @@ fi
 
 # update build ID on db version
 TODAY=`date +%Y%m%d`
-echo "update ad_system set lastmigrationscriptapplied = '${TODAY}_DailyBuild' || $BUILD_NUMBER || '/' || lastmigrationscriptapplied;" | sqlplus $ADEMPIERE_DB_USER/$ADEMPIERE_DB_PASSWORD@$ADEMPIERE_DB_SERVER/$ADEMPIERE_DB_NAME
+echo "update ad_system set lastmigrationscriptapplied = '${TODAY}_Daily10Build' || $BUILD_NUMBER || '/' || lastmigrationscriptapplied;" | sqlplus $ADEMPIERE_DB_USER/$ADEMPIERE_DB_PASSWORD@$ADEMPIERE_DB_SERVER/$ADEMPIERE_DB_NAME
 
 # Recreate seed
 cd /tmp
@@ -84,9 +86,9 @@ chmod 644 Adempiere.dmp Adempiere.log
 rm ${REPO}/org.adempiere.server-feature/data/seed/Adempiere.jar
 zip -9 ${REPO}/org.adempiere.server-feature/data/seed/Adempiere.jar Adempiere.log Adempiere.dmp
 rm Adempiere.log Adempiere.dmp
-mkdir -p /tmp/seed
-rm -f /tmp/seed/Adempiere.jar
-cp -p ${REPO}/org.adempiere.server-feature/data/seed/Adempiere.jar /tmp/seed/
+mkdir -p /tmp/seed10
+rm -f /tmp/seed10/Adempiere.jar
+cp -p ${REPO}/org.adempiere.server-feature/data/seed/Adempiere.jar /tmp/seed10/
 
 docker_stop.sh
 exit 0

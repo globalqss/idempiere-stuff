@@ -1,4 +1,4 @@
-wget -O /var/lib/jenkins/workspace/iDempiereDaily/org.adempiere.server-feature/data/seed/Adempiere.jar https://raw.githubusercontent.com/idempiere/binary.file/master/database/8.2/Adempiere.jar
+wget -O /var/lib/jenkins/workspace/iDempiereDaily/org.adempiere.server-feature/data/seed/Adempiere.jar https://raw.githubusercontent.com/idempiere/binary.file/master/database/10/Adempiere.jar
 
 REPO=/var/lib/jenkins/workspace/iDempiereDaily
 cd /tmp
@@ -11,7 +11,7 @@ docker_exec.sh chown oracle:dba /tmp/Adempiere.dmp
 
 export IDEMPIERE_HOME="$REPO"
 export ADEMPIERE_DB_USER=reference
-export ADEMPIERE_DB_SERVER=172.16.7.1
+export ADEMPIERE_DB_SERVER=127.0.0.1
 export ADEMPIERE_DB_PORT=1521
 export ADEMPIERE_DB_PATH=oracle
 export ADEMPIERE_DB_NAME=xe
