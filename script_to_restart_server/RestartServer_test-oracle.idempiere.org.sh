@@ -7,6 +7,7 @@ Parameter:
 - recreate -> reinstall and recreate the database
 - update_or_reinstall -> execute update.sh to get the newest from p2 repository, if update.sh fails then reinstall"
 ACTION="$1"
+
 if [ "$#" -gt 1 ] || { [ "$#" -eq 1 ] && [ "$ACTION" != "update" ] && [ "$ACTION" != "reinstall" ] && [ "$ACTION" != "recreate" ] && [ "$ACTION" != "update_or_reinstall" ] ; }
 then
     echo "$USAGE"
@@ -53,7 +54,9 @@ then
     echo "** Reinstalling iDempiere from installer - $(date +'%Y-%m-%d %H:%M:%S')"
     cd || exit 1
     echo "** Downloading installer - $(date +'%Y-%m-%d %H:%M:%S')"
-    wget --no-verbose -O idempiereServer.gtk.linux.x86_64.zip https://jenkins.idempiere.org/job/iDempiere/ws/org.idempiere.p2/target/products/org.adempiere.server.product/idempiereServer.gtk.linux.x86_64.zip
+    # --no-verbose
+    wget -O idempiereServer.gtk.linux.x86_64.zip https://sourceforge.net/projects/idempiere/files/devel/daily-server/idempiereServerDev12Daily.gtk.linux.x86_64.zip/download
+    # wget -O idempiereServer.gtk.linux.x86_64.zip https://jenkins.idempiere.org/job/iDempiere/ws/org.idempiere.p2/target/products/org.adempiere.server.product/idempiereServer.gtk.linux.x86_64.zip
     echo "** Backing up previous server - $(date +'%Y-%m-%d %H:%M:%S')"
     # assume idempiere must own /opt/idempiere
     # assume idempiere setup must have been executed at least one time.
@@ -94,7 +97,7 @@ UPDATE AD_SysConfig SET Value='Y' WHERE Name='ZK_GRID_EDIT_MODELESS';
 INSERT INTO ad_sysconfig (ad_sysconfig_id, ad_client_id, ad_org_id, created, updated, createdby, updatedby, isactive, name, value, description, entitytype, configurationlevel, ad_sysconfig_uu) VALUES(nextidfunc(50009,'N'), 0, 0, SYSDATE, SYSDATE, 100, 100, 'Y', 'ZK_BROWSER_TITLE', '*TEST ORACLE* iDempiere', NULL, 'U', 'S', generate_uuid());
 UPDATE AD_UserPreference SET IsDetailedZoomAcross='Y', IsUseSimilarTo='Y';
 UPDATE ad_column SET isautocomplete='Y' WHERE ad_reference_id IN (17,18,19);
-" | sqlplus idempiere/adempiere@localhost/xe
+" | sqlplus idempiere/adempiere@localhost/XEPDB1
 fi
 
 if [ "$#" -eq 1 ]
@@ -102,6 +105,14 @@ then
     echo "** Applying new scripts - $(date +'%Y-%m-%d %H:%M:%S')"
     cd /opt/idempiere/idempiere-server/utils || exit 1
     bash RUN_SyncDB.sh
+    if [ $? -ne 0 ]
+    then
+	echo "RUN_SyncDB.sh failed - please verify"
+	rm -f /tmp/deploying_now
+	touch /tmp/consecutive_reached
+	bash ~/zabbix_cmd.sh enable ; bash ~/zabbix_cmd.sh logout
+	exit 1
+    fi
     cd /opt/idempiere/idempiere-server || exit 1
     echo "** Signing database - $(date +'%Y-%m-%d %H:%M:%S')"
     timeout -k 30s 15s sh sign-database-build-alt.sh 2>&1 | grep -F SignDatabaseBuildApplication.start:

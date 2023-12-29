@@ -46,13 +46,20 @@ then
 	    exit 1
 	fi
     fi
+    REPO=https://jenkins.idempiere.org/job/idempiere-rest/ws/com.trekglobal.idempiere.extensions.p2/target/repository/
+    PRODUCT=com.trekglobal.idempiere.rest.api
+    bash update-prd.sh $REPO $PRODUCT
 
-    # install webstore
     sudo /usr/sbin/service idempiere start
     sleep 20
+    # install webstore
     ( echo uninstall org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
     ( echo install https://jenkins.idempiere.org/job/idempiere-webstore/ws/org.adempiere.webstore/target/org.adempiere.webstore-9.0.0-SNAPSHOT.jar; sleep 3 ) | telnet localhost 12612
     ( echo setbsl 5 org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
+    # install generaterandomorders
+    ( echo uninstall org.cloudempiere.generaterandomorders; sleep 3 ) | telnet localhost 12612
+    ( echo install https://github.com/cloudempiere/org.cloudempiere.generaterandomorders/releases/download/1.0.0.202303081707/org.cloudempiere.generaterandomorders_1.0.0.202303081707.jar; sleep 3 ) | telnet localhost 12612
+    ( echo setbsl 5 org.cloudempiere.generaterandomorders; sleep 3 ) | telnet localhost 12612
     sudo /usr/sbin/service idempiere stop
 
 fi
@@ -84,6 +91,10 @@ then
     echo "** Setting up server - $(date +'%Y-%m-%d %H:%M:%S')"
     bash silent-setup-alt.sh
 
+    REPO=https://jenkins.idempiere.org/job/idempiere-rest/ws/com.trekglobal.idempiere.extensions.p2/target/repository/
+    PRODUCT=com.trekglobal.idempiere.rest.api
+    bash update-prd.sh $REPO $PRODUCT
+
     # reinstall VaadinMobile
     # DESTINATION=/opt/idempiere-server
     # VMOPTS="-Dorg.eclipse.ecf.provider.filetransfer.excludeContributors=org.eclipse.ecf.provider.filetransfer.httpclient4 -Djava.net.preferIPv4Stack=true"
@@ -103,12 +114,16 @@ then
       # -repository $REPO \
       # -i $PRODUCT
 
-    # install webstore
     sudo /usr/sbin/service idempiere start
     sleep 20
+    # install webstore
     ( echo uninstall org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
     ( echo install https://jenkins.idempiere.org/job/idempiere-webstore/ws/org.adempiere.webstore/target/org.adempiere.webstore-9.0.0-SNAPSHOT.jar; sleep 3 ) | telnet localhost 12612
     ( echo setbsl 5 org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
+    # install generaterandomorders
+    ( echo uninstall org.cloudempiere.generaterandomorders; sleep 3 ) | telnet localhost 12612
+    ( echo install https://github.com/cloudempiere/org.cloudempiere.generaterandomorders/releases/download/1.0.0.202303081707/org.cloudempiere.generaterandomorders_1.0.0.202303081707.jar; sleep 3 ) | telnet localhost 12612
+    ( echo setbsl 5 org.cloudempiere.generaterandomorders; sleep 3 ) | telnet localhost 12612
     sudo /usr/sbin/service idempiere stop
 
 fi
@@ -121,13 +136,14 @@ then
     echo "
 CREATE EXTENSION \"uuid-ossp\";
 UPDATE AD_SysConfig SET Value='Y' WHERE Name='USE_EMAIL_FOR_LOGIN';
-UPDATE AD_SysConfig SET Value='Y' WHERE Name='ZK_GRID_EDIT_MODELESS';
-UPDATE AD_SysConfig SET Value='Y' WHERE Name='ZK_GRID_VIEW_USE_DEFER_RENDERING';
+/*UPDATE AD_SysConfig SET Value='Y' WHERE Name='ZK_GRID_EDIT_MODELESS';*/
+/*UPDATE AD_SysConfig SET Value='Y' WHERE Name='ZK_GRID_VIEW_USE_DEFER_RENDERING';*/
+/*UPDATE AD_SysConfig SET Value='Y' WHERE Name='ZK_AUTO_SAVE_CHANGES';*/
 INSERT INTO ad_sysconfig (ad_sysconfig_id, ad_client_id, ad_org_id, created, updated, createdby, updatedby, isactive, name, value, description, entitytype, configurationlevel, ad_sysconfig_uu) VALUES(nextidfunc(50009,'N'), 0, 0, statement_timestamp(), statement_timestamp(), 100, 100, 'Y', 'ZK_BROWSER_TITLE', '*TEST* iDempiere', NULL, 'U', 'S', generate_uuid());
 INSERT INTO ad_userpreference (ad_client_id, ad_org_id, ad_user_id, ad_userpreference_id, ad_userpreference_uu, autocommit, autonew, created, createdby, isactive, updated, updatedby, automaticdecimalplacesforamoun, toggleondoubleclick, isdetailedzoomacross, isusesimilarto, viewfindresult) VALUES(0, 0, 100, nextidfunc(200230,'N'), generate_uuid(), 'Y', 'Y', statement_timestamp(), 100, 'Y', statement_timestamp(), 100, 0, 'N', 'Y', 'Y', '0');
 INSERT INTO ad_userpreference (ad_client_id, ad_org_id, ad_user_id, ad_userpreference_id, ad_userpreference_uu, autocommit, autonew, created, createdby, isactive, updated, updatedby, automaticdecimalplacesforamoun, toggleondoubleclick, isdetailedzoomacross, isusesimilarto, viewfindresult) VALUES(11, 0, 100, nextidfunc(200230,'N'), generate_uuid(), 'Y', 'Y', statement_timestamp(), 100, 'Y', statement_timestamp(), 100, 0, 'N', 'Y', 'Y', '0');
 UPDATE AD_UserPreference SET IsDetailedZoomAcross='Y', IsUseSimilarTo='Y';
-UPDATE ad_column SET isautocomplete='Y' WHERE ad_reference_id IN (17,18,19,30) AND isactive='Y' AND isautocomplete='N';  /* Test IDEMPIERE-1540 */
+/* UPDATE ad_column SET isautocomplete='Y' WHERE ad_reference_id IN (17,18,19,30) AND isactive='Y' AND isautocomplete='N';  -- Test IDEMPIERE-1540 */
 " | psql -d idempiere -U adempiere
 fi
 
@@ -136,6 +152,14 @@ then
     echo "** Applying new scripts - $(date +'%Y-%m-%d %H:%M:%S')"
     cd /opt/idempiere-server/utils || exit 1
     bash RUN_SyncDB.sh
+    if [ $? -ne 0 ]
+    then
+        echo "RUN_SyncDB.sh failed - please verify"
+        rm -f /tmp/deploying_now
+        touch /tmp/consecutive_reached
+        bash ~/zabbix_cmd.sh enable ; bash ~/zabbix_cmd.sh logout
+        exit 1
+    fi
     cd /opt/idempiere-server || exit 1
     echo "** Signing database - $(date +'%Y-%m-%d %H:%M:%S')"
     timeout -k 30s 15s sh sign-database-build-alt.sh 2>&1 | grep -F SignDatabaseBuildApplication.start:
