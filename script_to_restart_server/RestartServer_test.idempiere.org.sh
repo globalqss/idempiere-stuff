@@ -46,6 +46,7 @@ then
 	    exit 1
 	fi
     fi
+    cd /opt/idempiere-server || exit 1
     REPO=https://jenkins.idempiere.org/job/idempiere-rest/ws/com.trekglobal.idempiere.extensions.p2/target/repository/
     PRODUCT=com.trekglobal.idempiere.rest.api
     bash update-prd.sh $REPO $PRODUCT
@@ -144,7 +145,7 @@ INSERT INTO ad_userpreference (ad_client_id, ad_org_id, ad_user_id, ad_userprefe
 INSERT INTO ad_userpreference (ad_client_id, ad_org_id, ad_user_id, ad_userpreference_id, ad_userpreference_uu, autocommit, autonew, created, createdby, isactive, updated, updatedby, automaticdecimalplacesforamoun, toggleondoubleclick, isdetailedzoomacross, isusesimilarto, viewfindresult) VALUES(11, 0, 100, nextidfunc(200230,'N'), generate_uuid(), 'Y', 'Y', statement_timestamp(), 100, 'Y', statement_timestamp(), 100, 0, 'N', 'Y', 'Y', '0');
 UPDATE AD_UserPreference SET IsDetailedZoomAcross='Y', IsUseSimilarTo='Y';
 /* UPDATE ad_column SET isautocomplete='Y' WHERE ad_reference_id IN (17,18,19,30) AND isactive='Y' AND isautocomplete='N';  -- Test IDEMPIERE-1540 */
-" | psql -d idempiere -U adempiere
+" | psql -d idempiere -U adempiere -h localhost
 fi
 
 if [ "$#" -eq 1 ]
