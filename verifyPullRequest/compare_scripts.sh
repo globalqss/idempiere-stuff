@@ -16,11 +16,11 @@
 #
 
 BASE=~/gitIdempiere/localdev/migration
-FOLDER=iD11
-if [ "x$2" = "x10" ]
+FOLDER=iD12
+if [ "x$2" = "x11" ]
 then
     BASE=~/gitIdempiere/local10/migration
-    FOLDER=iD10
+    FOLDER=iD11
 fi
 SCRIPT=$1
 
@@ -83,6 +83,18 @@ tput sgr0
 echo "***** Possible wrong entitytype *****"
 tput setaf 1
 fgrep -n "'U'" $PG
+tput sgr0
+echo "***** usage of to_date in postgres *****"
+tput setaf 1
+fgrep -n -i "to_date" $PG
+tput sgr0
+echo "***** usage of nextid *****"
+tput setaf 1
+fgrep -n -i "nextid" $PG
+tput sgr0
+echo "***** usage of torecordid *****"
+tput setaf 1
+fgrep -n -i "torecordid" $PG
 tput sgr0
 echo "***** adempiere. *****"
 tput setaf 1
