@@ -55,7 +55,7 @@ then
     cd || exit 1
     echo "** Downloading installer - $(date +'%Y-%m-%d %H:%M:%S')"
     # --no-verbose
-    wget -O idempiereServer.gtk.linux.x86_64.zip https://sourceforge.net/projects/idempiere/files/devel/daily-server/idempiereServerDev12Daily.gtk.linux.x86_64.zip/download
+    wget -O idempiereServer.gtk.linux.x86_64.zip https://sourceforge.net/projects/idempiere/files/devel/daily-server/idempiereServerDev13Daily.gtk.linux.x86_64.zip/download
     # wget -O idempiereServer.gtk.linux.x86_64.zip https://jenkins.idempiere.org/job/iDempiere/ws/org.idempiere.p2/target/products/org.adempiere.server.product/idempiereServer.gtk.linux.x86_64.zip
     echo "** Backing up previous server - $(date +'%Y-%m-%d %H:%M:%S')"
     # assume idempiere must own /opt/idempiere

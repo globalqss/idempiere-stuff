@@ -53,10 +53,10 @@ then
 
     sudo /usr/sbin/service idempiere start
     sleep 20
-    # install webstore
-    ( echo uninstall org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
-    ( echo install https://jenkins.idempiere.org/job/idempiere-webstore/ws/org.adempiere.webstore/target/org.adempiere.webstore-9.0.0-SNAPSHOT.jar; sleep 3 ) | telnet localhost 12612
-    ( echo setbsl 5 org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
+    # # install webstore
+    # ( echo uninstall org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
+    # ( echo install https://jenkins.idempiere.org/job/idempiere-webstore/ws/org.adempiere.webstore/target/org.adempiere.webstore-9.0.0-SNAPSHOT.jar; sleep 3 ) | telnet localhost 12612
+    # ( echo setbsl 5 org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
     # install generaterandomorders
     ( echo uninstall org.cloudempiere.generaterandomorders; sleep 3 ) | telnet localhost 12612
     ( echo install https://github.com/cloudempiere/org.cloudempiere.generaterandomorders/releases/download/1.0.0.202303081707/org.cloudempiere.generaterandomorders_1.0.0.202303081707.jar; sleep 3 ) | telnet localhost 12612
@@ -115,16 +115,12 @@ then
       # -repository $REPO \
       # -i $PRODUCT
 
+    # install plugins from folder
+    #   org.cloudempiere.generaterandomorders
     sudo /usr/sbin/service idempiere start
     sleep 20
-    # install webstore
-    ( echo uninstall org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
-    ( echo install https://jenkins.idempiere.org/job/idempiere-webstore/ws/org.adempiere.webstore/target/org.adempiere.webstore-9.0.0-SNAPSHOT.jar; sleep 3 ) | telnet localhost 12612
-    ( echo setbsl 5 org.adempiere.webstore; sleep 3 ) | telnet localhost 12612
-    # install generaterandomorders
-    ( echo uninstall org.cloudempiere.generaterandomorders; sleep 3 ) | telnet localhost 12612
-    ( echo install https://github.com/cloudempiere/org.cloudempiere.generaterandomorders/releases/download/1.0.0.202303081707/org.cloudempiere.generaterandomorders_1.0.0.202303081707.jar; sleep 3 ) | telnet localhost 12612
-    ( echo setbsl 5 org.cloudempiere.generaterandomorders; sleep 3 ) | telnet localhost 12612
+    cd /home/idempiere/plugins12 || exit 1
+    bash install_all_plugins.sh
     sudo /usr/sbin/service idempiere stop
 
 fi
@@ -166,15 +162,13 @@ then
     timeout -k 30s 15s sh sign-database-build-alt.sh 2>&1 | grep -F SignDatabaseBuildApplication.start:
 fi
 
-if [ "$ACTION" = "recreate" ]
-then
-    echo "** Importing languages - $(date +'%Y-%m-%d %H:%M:%S')"
-    sudo /usr/sbin/service idempiere start
-    bash ~/languages/addLanguages.sh
-    sudo /usr/sbin/service idempiere stop
-fi
-
 echo "** Starting server - $(date +'%Y-%m-%d %H:%M:%S')"
 sudo /usr/sbin/service idempiere start
 rm -f /tmp/deploying_now /tmp/consecutive_reached
 bash ~/zabbix_cmd.sh enable ; bash ~/zabbix_cmd.sh logout
+
+if [ "$ACTION" = "recreate" ]
+then
+    echo "** Importing languages - $(date +'%Y-%m-%d %H:%M:%S')"
+    bash ~/languages/addLanguages.sh
+fi
