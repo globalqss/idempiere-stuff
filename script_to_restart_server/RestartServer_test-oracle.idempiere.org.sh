@@ -92,12 +92,6 @@ then
     bash RUN_ImportIdempiere.sh <<!
 
 !
-    echo "
-UPDATE AD_SysConfig SET Value='Y' WHERE Name='ZK_GRID_EDIT_MODELESS';
-INSERT INTO ad_sysconfig (ad_sysconfig_id, ad_client_id, ad_org_id, created, updated, createdby, updatedby, isactive, name, value, description, entitytype, configurationlevel, ad_sysconfig_uu) VALUES(nextidfunc(50009,'N'), 0, 0, SYSDATE, SYSDATE, 100, 100, 'Y', 'ZK_BROWSER_TITLE', '*TEST ORACLE* iDempiere', NULL, 'U', 'S', generate_uuid());
-UPDATE AD_UserPreference SET IsDetailedZoomAcross='Y', IsUseSimilarTo='Y';
-UPDATE ad_column SET isautocomplete='Y' WHERE ad_reference_id IN (17,18,19);
-" | sqlplus idempiere/adempiere@localhost/XEPDB1
 fi
 
 if [ "$#" -eq 1 ]
@@ -112,6 +106,17 @@ then
 	touch /tmp/consecutive_reached
 	bash ~/zabbix_cmd.sh enable ; bash ~/zabbix_cmd.sh logout
 	exit 1
+    fi
+    if [ "$ACTION" = "recreate" ]
+    then
+        echo "
+INSERT INTO ad_sysconfig (ad_sysconfig_id, ad_client_id, ad_org_id, created, updated, createdby, updatedby, isactive, name, value, description, entitytype, configurationlevel, ad_sysconfig_uu) VALUES(nextidfunc(50009,'N'), 0, 0, SYSDATE, SYSDATE, 100, 100, 'Y', 'ZK_BROWSER_TITLE', '*TEST ORACLE* iDempiere', NULL, 'U', 'S', generate_uuid());
+INSERT INTO ad_userpreference (ad_client_id, ad_org_id, ad_user_id, ad_userpreference_id, ad_userpreference_uu, autocommit, autonew, created, createdby, isactive, updated, updatedby, automaticdecimalplacesforamoun, toggleondoubleclick, isdetailedzoomacross, isusesimilarto, viewfindresult) VALUES(0, 0, 100, nextidfunc(200230,'N'), generate_uuid(), 'Y', 'Y', sysdate, 100, 'Y', sysdate, 100, 0, 'N', 'Y', 'Y', '0');
+INSERT INTO ad_userpreference (ad_client_id, ad_org_id, ad_user_id, ad_userpreference_id, ad_userpreference_uu, autocommit, autonew, created, createdby, isactive, updated, updatedby, automaticdecimalplacesforamoun, toggleondoubleclick, isdetailedzoomacross, isusesimilarto, viewfindresult) VALUES(11, 0, 100, nextidfunc(200230,'N'), generate_uuid(), 'Y', 'Y', sysdate, 100, 'Y', sysdate, 100, 0, 'N', 'Y', 'Y', '0');
+UPDATE AD_UserPreference SET IsDetailedZoomAcross='Y', IsUseSimilarTo='Y';
+UPDATE AD_SysConfig SET Value='Y' WHERE Name='APPLICATION_LOGIN_INFO_SHOWN';
+UPDATE AD_System SET SystemStatus='E';
+" | sqlplus idempiere/adempiere@localhost/XEPDB1
     fi
     cd /opt/idempiere/idempiere-server || exit 1
     echo "** Signing database - $(date +'%Y-%m-%d %H:%M:%S')"

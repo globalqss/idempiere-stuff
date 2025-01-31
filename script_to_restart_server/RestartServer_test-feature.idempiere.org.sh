@@ -82,10 +82,6 @@ then
     echo "** Importing seed database - $(date +'%Y-%m-%d %H:%M:%S')"
     cd /opt/idempiere-server/utils || exit 1
     (yes | bash RUN_ImportIdempiere.sh )
-    echo "
-CREATE EXTENSION \"uuid-ossp\";
-INSERT INTO ad_sysconfig (ad_sysconfig_id, ad_client_id, ad_org_id, created, updated, createdby, updatedby, isactive, name, value, description, entitytype, configurationlevel, ad_sysconfig_uu) VALUES(nextidfunc(50009,'N'), 0, 0, statement_timestamp(), statement_timestamp(), 100, 100, 'Y', 'ZK_BROWSER_TITLE', '*TEST FEATURE* iDempiere', NULL, 'U', 'S', generate_uuid());
-" | psql -d idempiere -U adempiere
 fi
 
 if [ "$#" -eq 1 ]
@@ -93,6 +89,23 @@ then
     echo "** Applying new scripts - $(date +'%Y-%m-%d %H:%M:%S')"
     cd /opt/idempiere-server/utils || exit 1
     bash RUN_SyncDB.sh
+    if [ $? -ne 0 ]
+    then
+        echo "RUN_SyncDB.sh failed - please verify"
+        rm -f /tmp/deploying_now
+        touch /tmp/consecutive_reached
+        bash ~/zabbix_cmd.sh enable ; bash ~/zabbix_cmd.sh logout
+        exit 1
+    fi
+    if [ "$ACTION" = "recreate" ]
+    then
+        echo "
+CREATE EXTENSION \"uuid-ossp\";
+INSERT INTO ad_sysconfig (ad_sysconfig_id, ad_client_id, ad_org_id, created, updated, createdby, updatedby, isactive, name, value, description, entitytype, configurationlevel, ad_sysconfig_uu) VALUES(nextidfunc(50009,'N'), 0, 0, statement_timestamp(), statement_timestamp(), 100, 100, 'Y', 'ZK_BROWSER_TITLE', '*TEST FEATURE* iDempiere', NULL, 'U', 'S', generate_uuid());
+UPDATE AD_SysConfig SET Value='Y' WHERE Name='APPLICATION_LOGIN_INFO_SHOWN';
+UPDATE AD_System SET SystemStatus='E';
+" | psql -d idempiere -U adempiere -h localhost
+    fi
     cd /opt/idempiere-server || exit 1
     echo "** Signing database - $(date +'%Y-%m-%d %H:%M:%S')"
     timeout -k 30s 15s sh sign-database-build-alt.sh 2>&1 | grep -F SignDatabaseBuildApplication.start:
