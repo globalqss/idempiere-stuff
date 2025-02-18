@@ -66,7 +66,8 @@ ls $PG | fgrep -v "/migration/$FOLDER/postgresql/"
 tput sgr0
 echo "***** Big IDs *****"
 tput setaf 1
-grep -n "\b1[0-9][0-9][0-9][0-9][0-9][0-9]\b" $PG | grep -v ".sql:--"  | grep -v ".sql:SELECT register" | grep -v ".sql:INSERT INTO AD_Sequence"
+grep -n "\b1[0-9][0-9][0-9][0-9][0-9][0-9]\b" $PG | grep -v "^[0-9]*:--"  | grep -v "^[0-9]*:SELECT register" | grep -v "^[0-9]*:INSERT INTO AD_Sequence"
+grep -n "^INSERT INTO AD_Sequence.*\b1[0-9][0-9][0-9][0-9][0-9][0-9]\b" $PG | sed -e 's/\b1000000\b/_CURRENTNEXT_/' | sed -e 's/\b1000000\b/_STARTNO_/' | grep '\b1[0-9][0-9][0-9][0-9][0-9][0-9]\b'
 tput sgr0
 echo "***** C_AcctProcessor *****"
 tput setaf 1
