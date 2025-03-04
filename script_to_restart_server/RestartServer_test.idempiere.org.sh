@@ -47,9 +47,11 @@ then
 	fi
     fi
     cd /opt/idempiere-server || exit 1
+    # Reinstall REST
     REPO=https://jenkins.idempiere.org/job/idempiere-rest/ws/com.trekglobal.idempiere.extensions.p2/target/repository/
+    PLUGIN=com.trekglobal.idempiere.rest.api
     PRODUCT=com.trekglobal.idempiere.rest.api
-    bash update-prd.sh $REPO $PRODUCT
+    bash compare-update-prd.sh $REPO $PLUGIN $PRODUCT
 
     sudo /usr/sbin/service idempiere start
     sleep 20
@@ -92,28 +94,11 @@ then
     echo "** Setting up server - $(date +'%Y-%m-%d %H:%M:%S')"
     bash silent-setup-alt.sh
 
+    # Reinstall REST
     REPO=https://jenkins.idempiere.org/job/idempiere-rest/ws/com.trekglobal.idempiere.extensions.p2/target/repository/
+    PLUGIN=com.trekglobal.idempiere.rest.api
     PRODUCT=com.trekglobal.idempiere.rest.api
-    bash update-prd.sh $REPO $PRODUCT
-
-    # reinstall VaadinMobile
-    # DESTINATION=/opt/idempiere-server
-    # VMOPTS="-Dorg.eclipse.ecf.provider.filetransfer.excludeContributors=org.eclipse.ecf.provider.filetransfer.httpclient4 -Djava.net.preferIPv4Stack=true"
-    # REPO=https://jenkins.idempiere.org/job/vaadinmobile/ws/buckminster.output/com.trekglobal.vaadin.update_1.0.0-eclipse.feature/site.p2/
-    # PRODUCT=com.trekglobal.vaadinmobile
-    # cd $DESTINATION
-    # java $VMOPTS -jar plugins/org.eclipse.equinox.launcher_1.*.jar -install director \
-      # -configuration director/configuration -application org.eclipse.equinox.p2.director \
-      # -consoleLog -profileProperties org.eclipse.update.install.features=true \
-      # -destination $DESTINATION \
-      # -repository $REPO \
-      # -u $PRODUCT
-    # java $VMOPTS -jar plugins/org.eclipse.equinox.launcher_1.*.jar -install director \
-      # -configuration director/configuration -application org.eclipse.equinox.p2.director \
-      # -consoleLog -profileProperties org.eclipse.update.install.features=true \
-      # -destination $DESTINATION \
-      # -repository $REPO \
-      # -i $PRODUCT
+    bash compare-update-prd.sh $REPO $PLUGIN $PRODUCT
 
     # install plugins from folder
     #   org.cloudempiere.generaterandomorders
