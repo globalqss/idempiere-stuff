@@ -11,7 +11,7 @@ echo ""
 
 if [ "x$FORM_PROJECT" = "x" ]
 then
-    FORM_PROJECT="iDempiere" # default
+    FORM_PROJECT="Adempiere" # default
 fi
 
 if [ "x$FORM_TABLE" = "x" ]

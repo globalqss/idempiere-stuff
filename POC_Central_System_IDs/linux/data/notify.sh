@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Notify reservations of centralized ID for project
 #
@@ -46,7 +46,7 @@ done
 mv ${FILENOTIFY} ${FILENOTIFY}.sending
 
 DATETIME=`date '+%Y/%m/%d %H:%M:%S'`
-mail -s "Centralized ID Reservation for project $PROJECT - $DATETIME" $MAILLIST < ${FILENOTIFY}.sending
+mail -aFrom:no-reply@developer.idempiere.com -s "Centralized ID Reservation for project iDempiere - $DATETIME" $MAILLIST < ${FILENOTIFY}.sending
 echo "Notification mail sent"
 
 rm ${FILENOTIFY}.sending
